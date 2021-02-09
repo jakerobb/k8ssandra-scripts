@@ -1,0 +1,15 @@
+k8ssandra:
+  namespace: namespace
+cassandra:
+  clusterName: clustername
+ingress:
+  traefik:
+    enabled: true
+    repair:
+      host: "localhost"
+    stargate:
+      enabled: true
+      host: "localhost"
+stargate:
+  enabled: true
+  replicas: 2
