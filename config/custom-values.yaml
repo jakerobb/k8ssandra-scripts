@@ -1,7 +1,7 @@
 k8ssandra:
-  namespace: namespace
+  namespace: k8ssandra
 cassandra:
-  clusterName: clustername
+  clusterName: cluster1
 ingress:
   traefik:
     enabled: true
@@ -12,4 +12,3 @@ ingress:
       host: "localhost"
 stargate:
   enabled: true
-  replicas: 2
