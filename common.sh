@@ -59,20 +59,32 @@ getValueFromChartOrValuesFile() {
 }
 
 sayError() {
-    say -v Allison -r 200 "[[volm 0.04]] $1" &
-    echo -e "${BOLDRED}$1${NOCOLOR}"
-    wait
+  if [[ "${AUDIBLE_ANNOUNCEMENTS}" == "true" ]]; then
+    if command -v say > /dev/null; then
+      say -v Allison -r 200 "[[volm 0.04]] $1" &
+    fi
+  fi
+  echo -e "${BOLDRED}$1${NOCOLOR}"
+  wait
 }
 
 saySuccess() {
-    say -v Allison -r 200 "[[volm 0.04]] $1" &
-    echo -e "${BOLDGREEN}$1${NOCOLOR}"
-    wait
+  if [[ "${AUDIBLE_ANNOUNCEMENTS}" == "true" ]]; then
+    if command -v say > /dev/null; then
+      say -v Allison -r 200 "[[volm 0.04]] $1" &
+    fi
+  fi
+  echo -e "${BOLDGREEN}$1${NOCOLOR}"
+  wait
 }
 
 sayStatus() {
-    say -v Allison -r 200 "[[volm 0.04]] $1" &
-    wait
+  if [[ "${AUDIBLE_ANNOUNCEMENTS}" == "true" ]]; then
+    if command -v say > /dev/null; then
+      say -v Allison -r 200 "[[volm 0.04]] $1" &
+    fi
+  fi
+  wait
 }
 
 openUrl() {

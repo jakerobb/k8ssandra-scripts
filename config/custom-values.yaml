@@ -10,5 +10,8 @@ ingress:
     stargate:
       enabled: true
       host: "localhost"
+      graphql:
+        playground:
+          enabled: true
 stargate:
   enabled: true

@@ -18,3 +18,5 @@ KUBE_ENV=kind
 # Version of Kubernetes. Supported values vary by target environment; see setup-kind.sh and setup-k3d.sh for supported values.
 KUBE_VERSION=1.19.1
 
+# If true, when used on Mac, some long-running scripts will announce their completion aloud, allowing the user the freedom to step away.
+AUDIBLE_ANNOUNCEMENTS=true
