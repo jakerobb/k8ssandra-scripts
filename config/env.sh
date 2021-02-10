@@ -4,7 +4,7 @@
 # Customize your setup here
 
 # Absolute path to your K8ssandra repo
-K8SSANDRA_DIR=/Users/jakerobb/Projects/datastax/k8ssandra
+K8SSANDRA_DIR=/path/to/k8ssandra
 
 # relative to the k8ssandra-scripts directory
 VALUES_FILE=config/custom-values.yaml
