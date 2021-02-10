@@ -125,8 +125,8 @@ time taken, the total number of requests sent, and the requests per second. You'
 Note: the data model in use for this test is very simple. Each process repeatedly updates a single column on a single row. There is much that could be done to 
 improve upon this from a load test standpoint.
 
-#### unit-tests.sh
-Runs the unit test suite. 
+#### unit-tests.sh, integration-tests.sh
+Runs the unit test suite or the integration test suite, respectively. 
 Usage: `run/unit-tests.sh ['test name regex']`
 Runs the unit test suite, or a subset of it. The test name regex will match any substring of the concatenated strings passed to Describe(), Context(), and 
 It() functions in the test spec. The script automatically prepends the regex with `(i?)`, making it case-insensitive.
@@ -141,13 +141,17 @@ what gets printed to the console), and that is the string which will be tested a
 
 For an example, try passing `Stargate` or `medusa`. 
 
+### Utilities
 #### debug-templates.sh
 Usage: `utils/debug-templates.sh ['template file path']`
 Outputs the Helm templates that would be generated and installed by `setup-k8ssandra.sh` (helm install) or `update-k8ssandra.sh` (helm upgrade). If a template
 file path is specified, it will be passed to `helm template --debug` via the `--show-only` option. The template file path should be specified relative to the 
 chart, i.e. `utils/debug-templates.sh templates/stargate/stargate.yaml`
 
-
+### Watch
+#### watch-deployments.sh, watch-pods.sh, watch-services.sh, watch-statefulsets.sh
+These scripts simply watch the target namespace for deployments, pods, services, and statefulsets, respectively. They are useful for monitoring setup progress
+and watching for telltale problem indications (e.g. CrashLoopBackoff and high restart counts).
 
 ## Todo:
 * Update common.sh to detect color-capable shells and disable color automatically.

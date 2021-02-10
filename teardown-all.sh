@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")"
 source common.sh
 
 echo -e "${BOLDBLUE}Tearing down...${NOCOLOR}"
