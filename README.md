@@ -51,7 +51,7 @@ Updates the k8ssandra installation with the current value overrides. This is sho
 #### teardown-all.sh
 Usage: `./teardown-all.sh [-p]`
 * Uninstalls everything and tears down the Kubernetes environment.
-* The '-p' option, for "peacemeal", tears down individual components manually before destroying the environment. Without this option, we skip right to deleting
+* The `-p` option, for "peacemeal", tears down individual components manually before destroying the environment. Without this option, we skip right to deleting
   the cluster.
 
 
