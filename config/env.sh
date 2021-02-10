@@ -10,7 +10,7 @@ K8SSANDRA_DIR=/path/to/k8ssandra
 VALUES_FILE=config/custom-values.yaml
 
 # Name you want to use for your Helm installation
-RELEASENAME=releasename
+RELEASENAME=k8ssandra
 
 # Target environment. Supported values are "kind" and "k3d".
 KUBE_ENV=kind
