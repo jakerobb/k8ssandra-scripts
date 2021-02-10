@@ -10,12 +10,12 @@ echo ""
 echo -e "${BOLDCYAN}NAMESPACE: ${CYAN}${NAMESPACE}${NOCOLOR}"
 echo -e "${BOLDCYAN}CLUSTERNAME: ${CYAN}${CLUSTERNAME}${NOCOLOR}"
 echo -e "${BOLDCYAN}RELEASENAME: ${CYAN}${RELEASENAME}${NOCOLOR}"
-echo -e "${BOLDCYAN}KUBEENV: ${CYAN}${KUBEENV}${NOCOLOR}"
+echo -e "${BOLDCYAN}KUBE_ENV: ${CYAN}${KUBE_ENV}${NOCOLOR}"
 echo -e "${BOLDCYAN}Values:${NOCOLOR}"
 yq '.' ${VALUES_FILE}
 
 setup/setup-helm.sh
-if [[ "$KUBEENV" == "k3d" ]]; then
+if [[ "${KUBE_ENV}" == "k3d" ]]; then
   teardown/teardown-kind.sh
   setup/setup-k3d.sh
 else

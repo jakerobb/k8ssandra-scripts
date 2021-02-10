@@ -150,4 +150,7 @@ accessClusterResource() {
 source config/env.sh
 
 NAMESPACE="$(getValueFromChartOrValuesFile '.k8ssandra.namespace')"
+if [[ "${NAMESPACE}" == null ]]; then
+  NAMESPACE=default
+fi
 CLUSTERNAME="$(getValueFromChartOrValuesFile '.cassandra.clusterName')"

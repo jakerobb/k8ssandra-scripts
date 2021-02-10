@@ -6,7 +6,7 @@ source common.sh
 echo -e "${BOLDBLUE}Tearing down...${NOCOLOR}"
 echo -e "${BOLDCYAN}NAMESPACE: ${CYAN}${NAMESPACE}${NOCOLOR}"
 echo -e "${BOLDCYAN}RELEASENAME: ${CYAN}${RELEASENAME}${NOCOLOR}"
-echo -e "${BOLDCYAN}KUBEENV: ${CYAN}${KUBEENV}${NOCOLOR}"
+echo -e "${BOLDCYAN}KUBE_ENV: ${CYAN}${KUBE_ENV}${NOCOLOR}"
 
 if [[ "$1" == "-p" ]]; then
   teardown/teardown-k8ssandra.sh
@@ -14,7 +14,7 @@ if [[ "$1" == "-p" ]]; then
   teardown/teardown-dashboard.sh
 fi
 
-if [[ "$KUBEENV" == "k3d" ]]; then
+if [[ "$KUBE_ENV" == "k3d" ]]; then
   teardown/teardown-k3d.sh
 else
   teardown/teardown-kind.sh
