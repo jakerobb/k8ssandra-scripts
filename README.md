@@ -1,6 +1,6 @@
 # K8ssandra Scripts
 
-This collection of scripts streamlinea the process of developing and testing [K8ssandra](https://k8ssandra.io).
+This collection of scripts streamlines the process of developing and testing [K8ssandra](https://k8ssandra.io).
 
 ## Prerequisites
 * The following software installed:
@@ -57,7 +57,7 @@ Usage: `./teardown-all.sh [-p]`
 
 ### Setup and Installation
 #### setup-dashboard.sh
-* Installs kube-dashboard and an appropriate ServiceAccount and ClusterRoleBinding
+* Installs [Kubernetes Dashboard](https://github.com/kubernetes/dashboard) and an appropriate ServiceAccount and ClusterRoleBinding
 
 #### setup-helm.sh
 * Ensures that Helm is configured with the necessary repos and that they are updated
@@ -72,11 +72,11 @@ Usage: `./teardown-all.sh [-p]`
 * Invokes Helm to install k8ssandra into your cluster.
 
 #### setup-traefik.sh
-* Invokes Helm to install Traefik ingress into your cluster.
+* Invokes Helm to install [Traefik](https://traefik.io/) ingress into your cluster.
 
 ### Teardown
 #### teardown-dashboard.sh
-* Uninstalls kube-dashboard from your cluster.
+* Uninstalls Kubernetes Dashboard from your cluster.
 
 #### teardown-kind.sh
 * Deletes your kind cluster.
@@ -161,3 +161,4 @@ and watching for telltale problem indications (e.g. CrashLoopBackoff and high re
 * Add support for using k8ssandra from the helm repo instead of from a repo clone (note: setup-kind.sh depends on a kind config file from k8ssandra's docs)
 * Update setup-dashboard.sh and teardown-dashboard.sh to use Helm charts.
 * Add support for multiple / non-default datacenters (search for "dc1")
+* Add support for nginx for ingress
