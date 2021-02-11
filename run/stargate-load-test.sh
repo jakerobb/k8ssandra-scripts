@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 source common.sh
 
 STARGATE_ENABLED=$(getValueFromChartOrValuesFile '.stargate.enabled')
@@ -10,8 +10,8 @@ if [[ "${STARGATE_ENABLED}" != "true" ]]; then
   exit 1
 fi
 
-STARGATE_HOST="$(getValueFromChartOrValuesFile '.ingress.traefik.stargate.host')"
-if [[ "${STARGATE_HOST}" == "*" ]]; then
+STARGATE_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.host')"
+if [[ "${STARGATE_HOST}" == "*" || "${STARGATE_HOST}" == "null" || -z "${STARGATE_HOST}" ]]; then
   STARGATE_HOST=localhost
 fi
 
@@ -43,11 +43,15 @@ if [[ "$1" == "-n" ]]; then
     sayError "Unable to get an auth token; Stargate service is not available."
     exit 2
   fi
-  set -e
 
   TOKEN=$(jq -r '.authToken' <<< "${AUTH_RESPONSE}")
+  EXITCODE=$?
+  if [[ "$EXITCODE" -ne 0 ]]; then
+    sayError "Unable to parse the auth response, exit code ${EXITCODE}."
+    echo -e "Auth response:\n${AUTH_RESPONSE}"
+    exit 1
+  fi
 
-  set +e
   echo -e "${BOLDBLUE}Creating keyspace...${NOCOLOR}"
   curl -s \
        --location --request POST "${STARGATE_HOST}:8082/v2/schemas/keyspaces" \
@@ -75,7 +79,7 @@ if [[ "$1" == "-n" ]]; then
   TOTAL_REQUESTS=$((($NUM_REQUESTS*$NUM_PROCESSES)))
   echo -e "\n${BOLDBLUE}Spawning ${NUM_PROCESSES} processes...${NOCOLOR}"
   for ((i=1;i<=NUM_PROCESSES;++i)); do
-    ./stargate-load-test.sh "${TOKEN}" $i ${NUM_REQUESTS} &
+    run/stargate-load-test.sh "${TOKEN}" $i ${NUM_REQUESTS} &
   done
   echo -n "Starting requests in 3... "
   sleep 1
@@ -87,12 +91,18 @@ if [[ "$1" == "-n" ]]; then
   wait
   END_TIME=$(date '+%s')
   TOTAL_SECONDS=$((($END_TIME-$START_TIME)))
-  REQUEST_RATE=$((($TOTAL_REQUESTS/$TOTAL_SECONDS)))
-  echo -e "\n${BOLDGREEN}Test finished at $(date '+%r'). Sent ${TOTAL_REQUESTS} requests in ~${TOTAL_SECONDS} seconds (~${REQUEST_RATE}/sec).${NOCOLOR}"
+  if [[ "${TOTAL_SECONDS}" == "0" ]]; then
+    echo -e "\n${BOLDGREEN}Test finished at $(date '+%r'). Sent ${TOTAL_REQUESTS} requests in <1 second.${NOCOLOR}"
+  else
+    REQUEST_RATE=$((($TOTAL_REQUESTS/$TOTAL_SECONDS)))
+    echo -e "\n${BOLDGREEN}Test finished at $(date '+%r'). Sent ${TOTAL_REQUESTS} requests in ~${TOTAL_SECONDS} seconds (~${REQUEST_RATE}/sec).${NOCOLOR}"
+  fi
+
   RESULTS=""
-  echo
   rm -f stargate-load-combined.out
   cat stargate-load-*.out > stargate-load-combined.out
+
+  echo -e "\n${BOLDGREEN}Results Summary:${NOCOLOR}"
   sort stargate-load-combined.out | uniq -c
   rm -f stargate-load-*.out
 
