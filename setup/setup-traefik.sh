@@ -12,6 +12,8 @@ echo -e "\n${BOLDBLUE}Waiting for CRDs to load...${NOCOLOR}"
 
 until kubectl -n default wait --for condition=established --timeout=60s crd/traefikservices.traefik.containo.us &> /dev/null; do sleep 1; done
 
-echo -e "\n${BOLDGREEN}Traefik has been installed.${NOCOLOR}\n"
-echo -e "\n${BOLDGREEN}Traefik dashboard is available at:${NOCOLOR} http://localhost:9000/dashboard/\n"
-
+echo -e "\n${BOLDGREEN}Traefik has been installed.${NOCOLOR}"
+echo -e "\n${BOLDWHITE}Traefik dashboard is available at:${NOCOLOR} http://localhost:9000/dashboard/\n"
+if command -v open &> /dev/null; then
+  echo -e "\n${BOLDWHITE}To launch the Traefik dashboard, execute:${NOCOLOR} access/open-traefik.sh"
+fi
