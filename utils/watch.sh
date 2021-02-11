@@ -4,4 +4,4 @@ set -e
 cd "$(dirname "$0")/.."
 source common.sh
 
-watch -d kubectl get pods -n ${NAMESPACE}
+watch -d kubectl get ${1:-pods} -n ${NAMESPACE}

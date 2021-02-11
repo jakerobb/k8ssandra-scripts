@@ -148,10 +148,13 @@ Outputs the Helm templates that would be generated and installed by `setup-k8ssa
 file path is specified, it will be passed to `helm template --debug` via the `--show-only` option. The template file path should be specified relative to the 
 chart, i.e. `utils/debug-templates.sh templates/stargate/stargate.yaml`
 
-### Watch
-#### watch-deployments.sh, watch-pods.sh, watch-services.sh, watch-statefulsets.sh
-These scripts simply watch the target namespace for deployments, pods, services, and statefulsets, respectively. They are useful for monitoring setup progress
-and watching for telltale problem indications (e.g. CrashLoopBackoff and high restart counts).
+#### watch.sh
+Usage: `utils/watch.sh [resourceType]`
+Example: `utils/watch.sh`
+Example: `utils/watch.sh deployments`
+Example: `utils/watch.sh all`
+This script simply watches the target namespace for a resource type of your choosing. It is useful for monitoring setup progress and watching for telltale 
+problem indications (e.g. CrashLoopBackoff and high restart counts). If you don't provide a resource type, it will use `pods`.
 
 ## Todo:
 * Update common.sh to detect color-capable shells and disable color automatically.
