@@ -4,9 +4,6 @@ set -e
 cd "$(dirname "$0")/.."
 source common.sh
 
-echo -e "\n${BOLDBLUE}Deleting existing cluster...${NOCOLOR}"
-k3d cluster delete &> /dev/null || true
-
 case ${KUBE_VERSION} in
   1.20.0)
     IMAGE='rancher/k3s:v1.20.0-k3s1'

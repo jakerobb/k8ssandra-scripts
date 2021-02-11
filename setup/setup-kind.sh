@@ -4,9 +4,6 @@ set -e
 cd "$(dirname "$0")/.."
 source common.sh
 
-echo -e "\n${BOLDBLUE}Deleting existing cluster...${NOCOLOR}"
-kind delete cluster &> /dev/null || true
-
 case ${KUBE_VERSION} in
   1.20.0)
     IMAGE='kindest/node:v1.20.0'

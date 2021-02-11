@@ -17,8 +17,10 @@ yq '.' ${VALUES_FILE}
 setup/setup-helm.sh
 if [[ "${KUBE_ENV}" == "k3d" ]]; then
   teardown/teardown-kind.sh
+  teardown/teardown-k3d.sh
   setup/setup-k3d.sh
 else
+  teardown/teardown-kind.sh
   teardown/teardown-k3d.sh
   setup/setup-kind.sh
 fi

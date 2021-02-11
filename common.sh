@@ -154,3 +154,6 @@ if [[ "${NAMESPACE}" == null ]]; then
   NAMESPACE=default
 fi
 CLUSTERNAME="$(getValueFromChartOrValuesFile '.cassandra.clusterName')"
+if [[ "${CLUSTERNAME}" == null ]]; then
+  CLUSTERNAME=${RELEASENAME}
+fi
