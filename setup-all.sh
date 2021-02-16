@@ -4,15 +4,7 @@ cd "$(dirname "$0")"
 source common.sh
 
 echo -e "${BOLDBLUE}Setting up K8ssandra cluster...${NOCOLOR}"
-echo -e "${BOLDCYAN}K8ssandra directory: ${CYAN}${K8SSANDRA_DIR}${NOCOLOR}"
-echo -e "${BOLDCYAN}Git branch: ${CYAN}$(cd ${K8SSANDRA_DIR}; git branch --show-current 2>&1)${NOCOLOR}"
-echo ""
-echo -e "${BOLDCYAN}NAMESPACE: ${CYAN}${NAMESPACE}${NOCOLOR}"
-echo -e "${BOLDCYAN}CLUSTERNAME: ${CYAN}${CLUSTERNAME}${NOCOLOR}"
-echo -e "${BOLDCYAN}RELEASENAME: ${CYAN}${RELEASENAME}${NOCOLOR}"
-echo -e "${BOLDCYAN}KUBE_ENV: ${CYAN}${KUBE_ENV}${NOCOLOR}"
-echo -e "${BOLDCYAN}Values:${NOCOLOR}"
-yq '.' ${VALUES_FILE}
+printContext
 
 setup/setup-helm.sh
 if [[ "${KUBE_ENV}" == "k3d" ]]; then

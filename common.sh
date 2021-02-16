@@ -87,6 +87,24 @@ sayStatus() {
   wait
 }
 
+printContext() {
+  echo -e "${BOLDCYAN}K8ssandra directory: ${CYAN}${K8SSANDRA_DIR}${NOCOLOR}"
+  echo -e "${BOLDCYAN}Git branch: ${CYAN}$(cd ${K8SSANDRA_DIR}; git branch --show-current 2>&1)${NOCOLOR}"
+  echo ""
+  echo -e "${BOLDCYAN}NAMESPACE: ${CYAN}${NAMESPACE}${NOCOLOR}"
+  echo -e "${BOLDCYAN}CLUSTERNAME: ${CYAN}${CLUSTERNAME}${NOCOLOR}"
+  echo -e "${BOLDCYAN}RELEASENAME: ${CYAN}${RELEASENAME}${NOCOLOR}"
+  echo -e "${BOLDCYAN}KUBE_ENV: ${CYAN}${KUBE_ENV}${NOCOLOR}"
+  echo -e "${BOLDCYAN}Values:${NOCOLOR}"
+  yq '.' ${VALUES_FILE}
+}
+
+getCredentials() {
+  SECRET=$(kubectl get secret "${CLUSTERNAME}-superuser" -n ${NAMESPACE} -o=jsonpath='{.data}')
+  CASS_USERNAME="$(jq -r '.username' <<< "$SECRET" | base64 -d)"
+  CASS_PASSWORD="$(jq -r '.password' <<< "$SECRET" | base64 -d)"
+}
+
 openUrl() {
   URL="$1"
   if command -v open > /dev/null ; then
@@ -94,6 +112,21 @@ openUrl() {
     open "${URL}"
   else
     echo -e "\n${BOLDBLUE}Navigate your browser to: ${BOLDWHITE}${URL}${NOCOLOR}"
+  fi
+}
+
+openCqlsh() {
+  getCredentials
+  if [[ -n "$1" ]]; then
+    (
+      set -x
+      cqlsh -u "${CASS_USERNAME}" -p "${CASS_PASSWORD}" $1
+    )
+  else
+    (
+      set -x
+      cqlsh -u "${CASS_USERNAME}" -p "${CASS_PASSWORD}" localhost
+    )
   fi
 }
 
@@ -147,7 +180,28 @@ accessClusterResource() {
   fi
 }
 
+function abspath() {
+    # generate absolute path from relative path
+    # $1     : relative filename
+    # return : absolute path
+    if [ -d "$1" ]; then
+        # dir
+        (cd "$1"; pwd)
+    elif [ -f "$1" ]; then
+        # file
+        if [[ $1 = /* ]]; then
+            echo "$1"
+        elif [[ $1 == */* ]]; then
+            echo "$(cd "${1%/*}"; pwd)/${1##*/}"
+        else
+            echo "$(pwd)/$1"
+        fi
+    fi
+}
+
 source config/env.sh
+
+VALUES_FILE="$(abspath "${VALUES_FILE}")"
 
 NAMESPACE="$(getValueFromChartOrValuesFile '.k8ssandra.namespace')"
 if [[ "${NAMESPACE}" == null ]]; then

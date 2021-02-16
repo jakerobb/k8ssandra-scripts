@@ -9,10 +9,15 @@ else
   STORAGE_CLASS=standard
 fi
 
+printContext
+
+cd ${K8SSANDRA_DIR}
 if [[ -n "$1" ]]; then
-  helm template --debug ${CLUSTERNAME}-k8ssandra ${K8SSANDRA_DIR}/charts/k8ssandra --show-only "$1" \
+  set -x
+  helm template --debug ${RELEASENAME} charts/k8ssandra --show-only "$1" \
                 --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} --create-namespace -f ${VALUES_FILE}
 else
-  helm template --debug ${CLUSTERNAME}-k8ssandra ${K8SSANDRA_DIR}/charts/k8ssandra \
+  set -x
+  helm template --debug ${RELEASENAME} charts/k8ssandra \
                 --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} --create-namespace -f ${VALUES_FILE}
 fi
