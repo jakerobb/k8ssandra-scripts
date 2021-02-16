@@ -2,16 +2,3 @@ k8ssandra:
   namespace: k8ssandra
 cassandra:
   clusterName: cluster1
-ingress:
-  traefik:
-    enabled: true
-    repair:
-      host: "localhost"
-    stargate:
-      enabled: true
-      host: "localhost"
-      graphql:
-        playground:
-          enabled: true
-stargate:
-  enabled: true
