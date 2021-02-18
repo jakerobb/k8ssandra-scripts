@@ -203,10 +203,10 @@ source config/env.sh
 VALUES_FILE="$(abspath "${VALUES_FILE}")"
 
 NAMESPACE="$(getValueFromChartOrValuesFile '.k8ssandra.namespace')"
-if [[ "${NAMESPACE}" == null ]]; then
+if [[ -z "${NAMESPACE}" ||  "${NAMESPACE}" == null ]]; then
   NAMESPACE=default
 fi
 CLUSTERNAME="$(getValueFromChartOrValuesFile '.cassandra.clusterName')"
-if [[ "${CLUSTERNAME}" == null ]]; then
+if [[ -z "${CLUSTERNAME}" || "${CLUSTERNAME}" == null ]]; then
   CLUSTERNAME=${RELEASENAME}
 fi
