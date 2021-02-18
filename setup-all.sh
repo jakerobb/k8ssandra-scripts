@@ -16,10 +16,10 @@ else
   teardown/teardown-k3d.sh
   setup/setup-kind.sh
 fi
+setup/setup-metrics.sh
 setup/setup-dashboard.sh
 
-TRAEFIK_ENABLED="$(getValueFromChartOrValuesFile '.ingress.traefik.enabled')"
-if [[ "${TRAEFIK_ENABLED}" == "true" ]]; then
+if [[ "${INSTALL_TRAEFIK}" == "true" ]]; then
   setup/setup-traefik.sh
 fi
 

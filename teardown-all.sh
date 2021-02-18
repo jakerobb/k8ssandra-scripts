@@ -11,6 +11,7 @@ echo -e "${BOLDCYAN}KUBE_ENV: ${CYAN}${KUBE_ENV}${NOCOLOR}"
 if [[ "$1" == "-p" ]]; then
   teardown/teardown-k8ssandra.sh
   teardown/teardown-traefik.sh
+  teardown/teardown-metrics.sh
   teardown/teardown-dashboard.sh
 fi
 

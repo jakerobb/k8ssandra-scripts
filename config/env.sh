@@ -20,3 +20,6 @@ KUBE_VERSION=1.19.1
 
 # If true, when used on Mac, some long-running scripts will announce their completion aloud, allowing the user the freedom to step away.
 AUDIBLE_ANNOUNCEMENTS=true
+
+# If true, setup-all.sh will also include a Traefik installation for ingress
+INSTALL_TRAEFIK=true

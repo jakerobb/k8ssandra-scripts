@@ -43,7 +43,7 @@ if [[ "$1" == "-n" ]]; then
     sayError "Unable to get an auth token; Stargate service is not available."
     exit 2
   fi
-
+  echo "${AUTH_RESPONSE}"
   TOKEN=$(jq -r '.authToken' <<< "${AUTH_RESPONSE}")
   EXITCODE=$?
   if [[ "$EXITCODE" -ne 0 ]]; then

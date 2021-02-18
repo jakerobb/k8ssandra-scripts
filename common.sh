@@ -138,11 +138,10 @@ accessClusterResource() {
   FORWARD_PORT=$5
   SERVICE=$6
 
-  INGRESS_ENABLED="$(getValueFromChartOrValuesFile '.ingress.traefik.enabled')"
-  SPECIFIC_INGRESS_ENABLED="$(getValueFromChartOrValuesFile '.ingress.traefik.'${INGRESS_PROPERTY}'.enabled')"
+  INGRESS_ENABLED="$(getValueFromChartOrValuesFile '.'${INGRESS_PROPERTY}'.ingress.enabled')"
 
-  if [[ "${INGRESS_ENABLED}" == "true" && "${SPECIFIC_INGRESS_ENABLED}" == "true" ]]; then
-    INGRESS_HOST="$(getValueFromChartOrValuesFile '.ingress.traefik.'${INGRESS_PROPERTY}'.host')"
+  if [[ "${INGRESS_ENABLED}" == "true" ]]; then
+    INGRESS_HOST="$(getValueFromChartOrValuesFile '.'${INGRESS_PROPERTY}'.ingress.host')"
     if [[ "${INGRESS_HOST}" == "*" ]]; then
       INGRESS_HOST=localhost
     fi
@@ -151,7 +150,7 @@ accessClusterResource() {
       exit
     else
       echo -e "${BOLDRED}Unable to resolve ${INGRESS_HOST}; cannot use ingress. ${NOCOLOR}"
-      echo -e "${RED}To resolve this, configure a different value for ${MAGENTA}.ingress.traefik.${INGRESS_PROPERTY}.host${RED} or add an entry in your hosts file or local DNS service. Falling back to port forward...${NOCOLOR}"
+      echo -e "${RED}To resolve this, configure a different value for ${MAGENTA}.${INGRESS_PROPERTY}.ingress.host${RED} or add an entry in your hosts file or local DNS service. Falling back to port forward...${NOCOLOR}"
     fi
   fi
 
