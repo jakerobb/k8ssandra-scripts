@@ -1,6 +1,7 @@
 # K8ssandra Scripts
 
-This collection of scripts streamlines the process of developing and testing [K8ssandra](https://k8ssandra.io).
+This collection of scripts streamlines the process of developing and testing [K8ssandra](https://k8ssandra.io). To minimize the "magic" and maximize learning,
+most are designed to output the various `kubectl` and `helm` commands they invoke to do their jobs.
 
 ## Prerequisites
 * The following software installed:
@@ -14,6 +15,8 @@ This collection of scripts streamlines the process of developing and testing [K8
    * yq
 * Docker configured with sufficient resources (recommend: 16GB RAM and at least four CPU cores)
 * A clone of the [k8ssandra repo](https://github.com/k8ssandra/k8ssandra)
+   * Note: if you plan to make contributions to k8ssandra, we recommend that you fork the repo and then clone your fork. See the 
+     [contribution guidelines](https://github.com/k8ssandra/k8ssandra/blob/main/CONTRIBUTING.md) for more information.
 
 ### For Mac using Homebrew
 The following command will install most of what you need.
@@ -71,12 +74,15 @@ Usage: `./teardown-all.sh [-p]`
 #### setup-k8ssandra.sh
 * Invokes Helm to install k8ssandra into your cluster.
 
+#### setup-metrics.sh
+* Installs the Metrics Server into your cluster.
+
 #### setup-traefik.sh
 * Invokes Helm to install [Traefik](https://traefik.io/) ingress into your cluster.
 
 ### Teardown
 #### teardown-dashboard.sh
-* Uninstalls Kubernetes Dashboard from your cluster.
+* Invokes kubectl to remove Kubernetes Dashboard from your cluster.
 
 #### teardown-kind.sh
 * Deletes your kind cluster.
@@ -87,11 +93,18 @@ Usage: `./teardown-all.sh [-p]`
 #### teardown-k8ssandra.sh
 * Invokes Helm to uninstall k8ssandra from your cluster.
 
+#### teardown-metrics.sh
+* Invokes kubectl to remove the Metrics Server from your cluster.
+
 #### teardown-traefik.sh
 * Invokes Helm to uninstall Traefik from your cluster.
 
 
 ### Access
+#### open-cqlsh.sh
+Retrieves the superuser username and password, creates an appropriate port-forward (or, if ingress is enabled for Cassandra directly or via Stargate, uses 
+that), then launches cqlsh. The port-forward, if one was used, terminates automatically when you exit cqlsh.
+
 #### open-dashboard.sh
 Retrieves a login token, creates an appropriate port-forward, and directs you to the URL you should use to access the dashboard. If you are on a Mac, it will
 launch the URL in your default browser automatically.
@@ -112,7 +125,7 @@ Creates an appropriate port-forward (or, if ingress is enabled for Reaper, uses 
 If you are on a Mac, it will launch the URL in your default browser automatically.
 
 #### open-stargate-graphql-playground.sh
-Creates an appropriate port-forward (or, if ingress is enabled for Stargate, uses that), and directs you to the URL you should use to access the Playground. 
+Creates an appropriate port-forward (or, if ingress is enabled for Stargate GraphQL, uses that), and directs you to the URL you should use to access the Playground. 
 If you are on a Mac, it will launch the URL in your default browser automatically.
 
 ### Run
@@ -148,11 +161,19 @@ Outputs the Helm templates that would be generated and installed by `setup-k8ssa
 file path is specified, it will be passed to `helm template --debug` via the `--show-only` option. The template file path should be specified relative to the 
 chart, i.e. `utils/debug-templates.sh templates/stargate/stargate.yaml`
 
+#### get-credentials.sh
+(todo)
+
+#### get-value.sh
+(todo)
+
 #### watch.sh
-Usage: `utils/watch.sh [resourceType]`
-Example: `utils/watch.sh`
-Example: `utils/watch.sh deployments`
+
+Usage: `utils/watch.sh [resourceType]` \
+Example: `utils/watch.sh` \
+Example: `utils/watch.sh deployments` \
 Example: `utils/watch.sh all`
+
 This script simply watches the target namespace for a resource type of your choosing. It is useful for monitoring setup progress and watching for telltale 
 problem indications (e.g. CrashLoopBackoff and high restart counts). If you don't provide a resource type, it will use `pods`.
 
@@ -165,3 +186,7 @@ problem indications (e.g. CrashLoopBackoff and high restart counts). If you don'
 * Update setup-dashboard.sh and teardown-dashboard.sh to use Helm charts.
 * Add support for multiple / non-default datacenters (search for "dc1")
 * Add support for nginx for ingress
+* Add `-n [namespace]` option to watch.sh
+* Add `-c` option to unit-tests.sh and integration-tests.sh to add coverage
+* Flesh out docs for get-credentials.sh and get-value.sh
+* Use `set -x` in more scripts
