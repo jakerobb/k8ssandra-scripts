@@ -8,17 +8,35 @@ case ${KUBE_VERSION} in
   1.20.0)
     IMAGE='kindest/node:v1.20.0'
     ;;
+  1.19)
+    IMAGE='kindest/node:v1.19.7'
+    ;;
+  1.19.7)
+    IMAGE='kindest/node:v1.19.7'
+    ;;
   1.19.1)
     IMAGE='kindest/node:v1.19.1'
+    ;;
+  1.18)
+    IMAGE='kindest/node:v1.18.8'
     ;;
   1.18.8)
     IMAGE='kindest/node:v1.18.8'
     ;;
+  1.17)
+    IMAGE='kindest/node:v1.17.11'
+    ;;
   1.17.11)
     IMAGE='kindest/node:v1.17.11'
     ;;
+  1.16)
+    IMAGE='kindest/node:v1.16.15'
+    ;;
   1.16.15)
     IMAGE='kindest/node:v1.16.15'
+    ;;
+  1.15)
+    IMAGE='kindest/node:v1.15.12'
     ;;
   1.15.12)
     IMAGE='kindest/node:v1.15.12'

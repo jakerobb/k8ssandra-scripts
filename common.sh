@@ -105,6 +105,58 @@ getCredentials() {
   CASS_PASSWORD="$(jq -r '.password' <<< "$SECRET" | base64 -d)"
 }
 
+getStargateHost() {
+  STARGATE_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.rest.host')"
+  if [[ "${STARGATE_HOST}" == "*" || "${STARGATE_HOST}" == "null" || -z "${STARGATE_HOST}" ]]; then
+    STARGATE_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.host')"
+    if [[ "${STARGATE_HOST}" == "*" || "${STARGATE_HOST}" == "null" || -z "${STARGATE_HOST}" ]]; then
+      STARGATE_HOST=localhost
+    fi
+  fi
+}
+
+getStargateAuthToken() {
+  AUTH_RESPONSE=$(curl -s --show-error --location --request POST "http://${STARGATE_HOST}:8081/v1/auth" \
+     --header 'Content-Type: application/json' \
+     --data-raw "{\"username\": \"${CASS_USERNAME}\",\"password\": \"${CASS_PASSWORD}\"}")
+  EXITCODE=$?
+  if [[ "$EXITCODE" -ne 0 ]]; then
+    sayError "Unable to get an auth token, exit code ${EXITCODE}."
+    exit 1
+  elif [[ "$AUTH_RESPONSE" == "Service Unavailable" ]]; then
+    sayError "Unable to get an auth token; Stargate service is not available."
+    exit 2
+  fi
+  echo "${AUTH_RESPONSE}"
+  STARGATE_AUTH_TOKEN=$(jq -r '.authToken' <<< "${AUTH_RESPONSE}")
+
+  EXITCODE=$?
+  if [[ "$EXITCODE" -ne 0 ]]; then
+    sayError "Unable to parse the auth response, exit code ${EXITCODE}."
+    echo -e "Auth response:\n${AUTH_RESPONSE}"
+    exit 1
+  fi
+}
+
+callStargateRestApi() {
+  VERB=$1
+  REQUEST_PATH=$2
+  REQUEST_BODY=$3
+  if [[ -z "${REQUEST_BODY}" ]]; then
+    curl -s \
+       --location --request "${VERB}" "${STARGATE_HOST}:8082${REQUEST_PATH}" \
+       --header "X-Cassandra-Token: ${STARGATE_AUTH_TOKEN}"
+  else
+    curl -s \
+       --location --request "${VERB}" "${STARGATE_HOST}:8082${REQUEST_PATH}" \
+       --header "X-Cassandra-Token: ${STARGATE_AUTH_TOKEN}" \
+       --header 'Content-Type: application/json' \
+       --data-raw "${REQUEST_BODY}"
+  fi
+  CURL_EXIT_CODE=$?
+  return ${CURL_EXIT_CODE}
+}
+
 openUrl() {
   URL="$1"
   if command -v open > /dev/null ; then

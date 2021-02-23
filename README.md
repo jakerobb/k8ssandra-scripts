@@ -167,6 +167,18 @@ chart, i.e. `utils/debug-templates.sh templates/stargate/stargate.yaml`
 #### get-value.sh
 (todo)
 
+#### resume-cassandra.sh
+(todo)
+
+#### scale-cassandra.sh
+(todo)
+
+#### stop-cassandra.sh
+(todo)
+
+#### get-value.sh
+(todo)
+
 #### watch.sh
 
 Usage: `utils/watch.sh [resourceType]` \
@@ -188,5 +200,5 @@ problem indications (e.g. CrashLoopBackoff and high restart counts). If you don'
 * Add support for nginx for ingress
 * Add `-n [namespace]` option to watch.sh
 * Add `-c` option to unit-tests.sh and integration-tests.sh to add coverage
-* Flesh out docs for get-credentials.sh and get-value.sh
+* Flesh out docs for get-credentials.sh, get-value.sh, and other new entries under utils
 * Use `set -x` in more scripts

@@ -5,6 +5,8 @@ cd "$(dirname "$0")/.."
 source common.sh
 
 echo -e "\n${BOLDBLUE}Waiting for Cassandra statefulset to exist...${NOCOLOR}"
+# simulate set -x here; I don't want it to repeat every time through the loop.
+echo "++ kubectl get statefulset -n ${NAMESPACE} ${CLUSTERNAME}-dc1-default-sts"
 while : ; do
   kubectl get statefulset -n ${NAMESPACE} ${CLUSTERNAME}-dc1-default-sts && break
   sleep 5

@@ -10,10 +10,7 @@ if [[ "${STARGATE_ENABLED}" != "true" ]]; then
   exit 1
 fi
 
-STARGATE_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.host')"
-if [[ "${STARGATE_HOST}" == "*" || "${STARGATE_HOST}" == "null" || -z "${STARGATE_HOST}" ]]; then
-  STARGATE_HOST=localhost
-fi
+getStargateHost
 
 typeset -i i i # i is an integer
 typeset -i i NUM_PROCESSES # end is an integer
@@ -25,61 +22,33 @@ if [[ "$1" == "-n" ]]; then
   echo -e "${BOLDBLUE}Stargate host: ${BLUE}${STARGATE_HOST}${NOCOLOR}"
   echo -e "${BOLDBLUE}Determining credentials for ${CLUSTERNAME}...${NOCOLOR}"
 
-  set -e
-  SECRET=$(kubectl get secret "${CLUSTERNAME}-superuser" -n ${NAMESPACE} -o=jsonpath='{.data}')
-  USERNAME="$(jq -r '.username' <<< "$SECRET" | base64 -d)"
-  PASSWORD="$(jq -r '.password' <<< "$SECRET" | base64 -d)"
+  getCredentials
 
   set +e
   echo -e "${BOLDBLUE}Getting app token...${NOCOLOR}"
-  AUTH_RESPONSE=$(curl -s --show-error --location --request POST "http://${STARGATE_HOST}:8081/v1/auth" \
-       --header 'Content-Type: application/json' \
-       --data-raw "{\"username\": \"${USERNAME}\",\"password\": \"${PASSWORD}\"}")
-  EXITCODE=$?
-  if [[ "$EXITCODE" -ne 0 ]]; then
-    sayError "Unable to get an auth token, exit code ${EXITCODE}."
-    exit 1
-  elif [[ "$AUTH_RESPONSE" == "Service Unavailable" ]]; then
-    sayError "Unable to get an auth token; Stargate service is not available."
-    exit 2
-  fi
-  echo "${AUTH_RESPONSE}"
-  TOKEN=$(jq -r '.authToken' <<< "${AUTH_RESPONSE}")
-  EXITCODE=$?
-  if [[ "$EXITCODE" -ne 0 ]]; then
-    sayError "Unable to parse the auth response, exit code ${EXITCODE}."
-    echo -e "Auth response:\n${AUTH_RESPONSE}"
-    exit 1
-  fi
+  getStargateAuthToken
 
-  echo -e "${BOLDBLUE}Creating keyspace...${NOCOLOR}"
-  curl -s \
-       --location --request POST "${STARGATE_HOST}:8082/v2/schemas/keyspaces" \
-       --header "X-Cassandra-Token: ${TOKEN}" \
-       --header 'Content-Type: application/json' \
-       --data-raw '{"name": "users_keyspace","replicas": 1}'
+  RANDOM_SUFFIX=$(LC_ALL=C tr -dc 'a-z' < /dev/urandom | head -c 6)
+  KEYSPACE_NAME="stargate_load_test_${RANDOM_SUFFIX}"
+
+  echo -e "${BOLDBLUE}Creating keyspace ${KEYSPACE_NAME}...${NOCOLOR}"
+  callStargateRestApi 'POST' "/v2/schemas/keyspaces"  '{"name": "'${KEYSPACE_NAME}'","replicas": 1}'
 
   echo -e "\n${BOLDBLUE}Creating table...${NOCOLOR}"
-  curl -s \
-       --location --request POST "${STARGATE_HOST}:8082/v2/schemas/keyspaces/users_keyspace/tables" \
-       --header "X-Cassandra-Token: ${TOKEN}" \
-       --header 'Content-Type: application/json' \
-       --data-raw '{"name": "users","columnDefinitions":[{"name": "firstname","typeDefinition": "text"},{"name": "lastname","typeDefinition": "text"},{"name": "email","typeDefinition": "text"},{"name": "favorite color","typeDefinition": "text"}],"primaryKey":{"partitionKey": ["firstname"],"clusteringKey": ["lastname"]},"tableOptions":{"defaultTimeToLive": 0,"clusteringExpression":[{ "column": "lastname", "order": "ASC" }]}}'
+  callStargateRestApi 'POST' "/v2/schemas/keyspaces/${KEYSPACE_NAME}/tables" \
+                      '{"name": "testdata","columnDefinitions":[{"name": "firstname","typeDefinition": "text"},{"name": "lastname","typeDefinition": "text"},{"name": "email","typeDefinition": "text"},{"name": "favorite color","typeDefinition": "text"}],"primaryKey":{"partitionKey": ["firstname"],"clusteringKey": ["lastname"]},"tableOptions":{"defaultTimeToLive": 0,"clusteringExpression":[{ "column": "lastname", "order": "ASC" }]}}'
 
   set -e
   echo -e "\n${BOLDBLUE}Creating data rows...${NOCOLOR}"
   for ((i=1;i<=NUM_PROCESSES;++i)); do
-    curl -s \
-         --location --request POST "http://${STARGATE_HOST}:8082/v2/keyspaces/users_keyspace/users" \
-         --header "X-Cassandra-Token: ${TOKEN}" \
-         --header 'Content-Type: application/json' \
-         --data-raw "{\"firstname\": \"Mookie${i}\",\"lastname\": \"Betts\",\"email\": \"mookie.betts.${i}@email.com\",\"favorite color\": \"blue\"}" > /dev/null &
+    callStargateRestApi 'POST' "/v2/keyspaces/${KEYSPACE_NAME}/testdata" \
+         "{\"firstname\": \"Mookie${i}\",\"lastname\": \"Betts\",\"email\": \"mookie.betts.${i}@email.com\",\"favorite color\": \"blue\"}" > /dev/null &
   done
 
   TOTAL_REQUESTS=$((($NUM_REQUESTS*$NUM_PROCESSES)))
   echo -e "\n${BOLDBLUE}Spawning ${NUM_PROCESSES} processes...${NOCOLOR}"
   for ((i=1;i<=NUM_PROCESSES;++i)); do
-    run/stargate-load-test.sh "${TOKEN}" $i ${NUM_REQUESTS} &
+    run/stargate-load-test.sh "${STARGATE_AUTH_TOKEN}" "${KEYSPACE_NAME}" $i ${NUM_REQUESTS} &
   done
   echo -n "Starting requests in 3... "
   sleep 1
@@ -106,24 +75,25 @@ if [[ "$1" == "-n" ]]; then
   sort stargate-load-combined.out | uniq -c
   rm -f stargate-load-*.out
 
+  echo -e "${BOLDBLUE}Deleting keyspace ${KEYSPACE_NAME}...${NOCOLOR}"
+  callStargateRestApi 'DELETE' "/v2/schemas/keyspaces/${KEYSPACE_NAME}"
+
   sayStatus "Test finished."
   exit
 fi
 
-TOKEN=$1
-INDEX=$2
-CALLS=$3
+STARGATE_AUTH_TOKEN=$1
+KEYSPACE_NAME=$2
+INDEX=$3
+CALLS=$4
 
 sleep 3
 echo -n "" > stargate-load-${INDEX}.out
 for ((i=1;i<=CALLS;++i)); do
-  RESPONSE=$(curl -s \
-       --location --request PUT "http://${STARGATE_HOST}:8082/v2/keyspaces/users_keyspace/users/Mookie${INDEX}/Betts" \
-       --header "X-Cassandra-Token: ${TOKEN}" \
-       --header 'Content-Type: application/json' \
-       --data-raw "{\"email\": \"mookie.betts.${INDEX}.${i}@email.com\"}")
+  RESPONSE=$(callStargateRestApi 'PUT' "/v2/keyspaces/${KEYSPACE_NAME}/testdata/Mookie${INDEX}/Betts" \
+       "{\"email\": \"mookie.betts.${INDEX}.${i}@email.com\",\"favorite color\": \"blue\"}")
   EXIT_CODE=$?
-  EXPECTED="{\"data\":{\"email\":\"mookie.betts.${INDEX}.${i}@email.com\"}}"
+  EXPECTED="{\"data\":{\"email\":\"mookie.betts.${INDEX}.${i}@email.com\",\"favorite color\":\"blue\"}}"
   if [[ "$EXIT_CODE" -ne 0 ]]; then
     >&2 echo -ne "${BOLDRED}X${NOCOLOR}"
     echo "exit ${EXIT_CODE}" >> stargate-load-${INDEX}.out
