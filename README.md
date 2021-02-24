@@ -29,9 +29,11 @@ issue or PR.
 ## Getting Started
 
 1. Edit `config/env.sh` with the details of your setup.
+   * See [config/README.md](config/README.md) for more details. 
 2. Edit `config/custom-values.yaml` with whatever values overrides you wish to supply to Helm.
    * The file can be empty, but errors will occur if it does not exist.
    * Note that `config/env.sh` specifies the path to this file; if you change the path there, create or edit that file instead.
+   * See [config/README.md](config/README.md) for more details.
 3. To set up a complete cluster from scratch, run `setup-all.sh`.
 
 ## Scripts
