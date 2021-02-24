@@ -251,6 +251,5 @@ All scripts accept the following options:
 * Update setup-dashboard.sh and teardown-dashboard.sh to use Helm charts.
 * Add support for multiple / non-default datacenters (search for "dc1")
 * Add support for nginx for ingress
-* Add `-n [namespace]` option to watch.sh
 * Add `-c` option to unit-tests.sh and integration-tests.sh to add coverage
 * Use `set -x` in more scripts
