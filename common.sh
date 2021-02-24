@@ -306,10 +306,12 @@ else
   BOLDWHITE=$(printf '\033[1;37m')
 fi
 
-while getopts :n: opt; do
+DATACENTER="$(getValueFromChartOrValuesFile '.cassandra.datacenters[0].name')"
+while getopts :n:d: opt; do
   case ${opt} in
     n) NAMESPACE=${OPTARG}
-      shift
+      ;;
+    d) DATACENTER=${OPTARG}
       ;;
     \:)
       echo -e "${BOLDRED}Missing required option after -${OPTARG}${NOCOLOR}" >&2
@@ -321,6 +323,6 @@ while getopts :n: opt; do
       exit 100
     ;;
   esac
-  shift
+  shift $((OPTIND -1))
 done
 

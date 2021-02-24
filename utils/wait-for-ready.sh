@@ -6,16 +6,16 @@ source common.sh
 
 echo -e "\n${BOLDBLUE}Waiting for Cassandra statefulset to exist...${NOCOLOR}"
 # simulate set -x here; I don't want it to repeat every time through the loop.
-echo "++ kubectl get statefulset -n ${NAMESPACE} ${CLUSTERNAME}-dc1-default-sts"
+echo "++ kubectl get statefulset -n ${NAMESPACE} ${CLUSTERNAME}-${DATACENTER}-default-sts"
 while : ; do
-  kubectl get statefulset -n ${NAMESPACE} ${CLUSTERNAME}-dc1-default-sts && break
+  kubectl get statefulset -n ${NAMESPACE} ${CLUSTERNAME}-${DATACENTER}-default-sts && break
   sleep 5
 done
 
 echo -e "\n${BOLDBLUE}Waiting for Cassandra to start...${NOCOLOR}"
 (
   set -x
-  kubectl rollout status -n ${NAMESPACE} statefulset ${CLUSTERNAME}-dc1-default-sts
+  kubectl rollout status -n ${NAMESPACE} statefulset ${CLUSTERNAME}-${DATACENTER}-default-sts
 )
 
 set +e
@@ -31,7 +31,7 @@ if [[ "${STARGATE_ENABLED}" == "true" ]]; then
   echo -e "\n${BOLDBLUE}Waiting for Stargate to start...${NOCOLOR}"
   (
     set -x
-    kubectl rollout status -n ${NAMESPACE} deployment ${RELEASE_NAME}-dc1-stargate
+    kubectl rollout status -n ${NAMESPACE} deployment ${RELEASE_NAME}-${DATACENTER}-stargate
   )
 else
   echo -e "\n${BOLDBLUE}Stargate is disabled; nothing to wait for.${NOCOLOR}"

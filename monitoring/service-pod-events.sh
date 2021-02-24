@@ -6,10 +6,11 @@ source common.sh
 SERVICE_NAME=$1
 
 if [[ -z "${SERVICE_NAME}" ]]; then
-  echo -e "${BOLDRED}Usage: $0 [serviceName]${NOCOLOR}"
   echo -e "${BOLDCYAN}Services in ${NAMESPACE}:${NOCOLOR}"
   kubectl get service -n ${NAMESPACE}
-  exit 1
+
+  SERVICE_NAME="${RELEASE_NAME}-${DATACENTER}-service"
+  echo -e "\n${BOLDCYAN}Defaulting to ${SERVICE_NAME}...${NOCOLOR}"
 fi
 
 set +e

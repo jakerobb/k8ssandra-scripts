@@ -5,11 +5,13 @@ source common.sh
 
 SERVICE_NAME=$1
 
+set +e
 if [[ -z "${SERVICE_NAME}" ]]; then
-  echo -e "${BOLDRED}Usage: $(basename "$0") [serviceName]${NOCOLOR}"
   echo -e "${BOLDCYAN}Services in ${NAMESPACE}:${NOCOLOR}"
   kubectl get service -n ${NAMESPACE}
-  exit 1
+
+  SERVICE_NAME="${RELEASE_NAME}-${DATACENTER}-service"
+  echo -e "\n${BOLDCYAN}Defaulting to ${SERVICE_NAME}...${NOCOLOR}"
 fi
 
 watch -cd service-pod-events.sh ${COLORMODE} ${SERVICE_NAME}

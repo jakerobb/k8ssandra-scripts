@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 source common.sh
 
 echo -e "\n${BOLDBLUE}Ensuring Cassandra is ready...${NOCOLOR}"
-kubectl rollout status -n ${NAMESPACE} statefulset ${CLUSTERNAME}-dc1-default-sts
+kubectl rollout status -n ${NAMESPACE} statefulset ${CLUSTERNAME}-${DATACENTER}-default-sts
 
 CASSANDRA_INGRESS_ENABLED="$(getValueFromChartOrValuesFile '.cassandra.ingress.enabled')"
 STARGATE_ENABLED="$(getValueFromChartOrValuesFile '.stargate.enabled')"
@@ -29,7 +29,7 @@ fi
 if [[ "${STARGATE_ENABLED}" == "true" && "${STARGATE_CASSANDRA_INGRESS_ENABLED}" == "true" ]]; then
   echo -e "${BOLDBLUE}Using via-Stargate ingress...${NOCOLOR}"
   echo -e "\n${BOLDBLUE}Waiting for Stargate to start...${NOCOLOR}"
-  until kubectl wait --for=condition=available -n ${NAMESPACE} deployment ${RELEASE_NAME}-dc1-stargate &> /dev/null; do sleep 1; done
+  until kubectl wait --for=condition=available -n ${NAMESPACE} deployment ${RELEASE_NAME}-${DATACENTER}-stargate &> /dev/null; do sleep 1; done
   echo -e "\n${BOLDGREEN}Stargate is ready!${NOCOLOR}\n"
 
   INGRESS_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.host')"
@@ -52,7 +52,7 @@ fi
 kill -9 $(cat "cassandra-port-forward.pid" 2> /dev/null) &> /dev/null || true
 
 echo -e "\n${BOLDBLUE}Forwarding local port 9042 to Cassandra...${NOCOLOR}"
-kubectl port-forward -n ${NAMESPACE} service/${CLUSTERNAME}-dc1-service 9042 &> "cassandra-port-forward.log" &
+kubectl port-forward -n ${NAMESPACE} service/${CLUSTERNAME}-${DATACENTER}-service 9042 &> "cassandra-port-forward.log" &
 PORT_FORWARD_PID=$!
 echo "${PORT_FORWARD_PID}" > "cassandra-port-forward.pid"
 sleep 0.5

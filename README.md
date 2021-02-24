@@ -235,11 +235,12 @@ By default, all scripts use colorized output, unless stdout is not a terminal (t
 
 All scripts accept the following options:
 
-| Option       | Description |
-| ------------ | ----------- |
-| --nocolor    | Disable colorized output regardless of stdout's tty-ness. |
-| --color      | Enable colorized output regardless of stdout's tty-ness. |
-| -n namespace | Use the specified namespace instead of the one specified in the values file. Note that some scripts might not perform correctly when using an alternate namespace. | 
+| Option        | Description |
+| ------------- | ----------- |
+| --nocolor     | Disable colorized output regardless of stdout's tty-ness. |
+| --color       | Enable colorized output regardless of stdout's tty-ness. |
+| -n namespace  | Use the specified namespace instead of the one specified in the values file. Note that some scripts might not perform correctly when using an alternate namespace. | 
+| -d datacenter | Use the specified datacenter instead of the default ("dc1" by default unless you have custom topology, in which case it's whichever datacenter is listed first). Not all scripts make use of this value. | 
 
 
 ## Todo:
@@ -249,7 +250,6 @@ All scripts accept the following options:
   regard to creation and destruction of the cluster) for this.
 * Add support for using k8ssandra from the helm repo instead of from a repo clone (note: setup-kind.sh depends on a kind config file from k8ssandra's docs)
 * Update setup-dashboard.sh and teardown-dashboard.sh to use Helm charts.
-* Add support for multiple / non-default datacenters (search for "dc1")
 * Add support for nginx for ingress
 * Add `-c` option to unit-tests.sh and integration-tests.sh to add coverage
 * Use `set -x` in more scripts
