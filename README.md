@@ -157,13 +157,13 @@ For an example, try passing `Stargate` or `medusa`.
 ### Monitoring
 #### pod-events.sh
 Usage: `monitoring/pod-events.sh [podName]` \
-Example: `monitoring/pod-events.sh k8ssandra-dc1-stargate-85948dc948-gcbqb` \
+Example: `monitoring/pod-events.sh k8ssandra-dc1-stargate-85948dc948-gcbqb` 
 
 This script prints the Events that Kubernetes has tracked against the specified pod. If you do not specify a pod, it will print a list of pods in the namespace.
 
 #### service-pod-events.sh
 Usage: `monitoring/service-pod-events.sh [serviceName]` \
-Example: `monitoring/service-pod-events.sh k8ssandra-dc1-stargate-service` \
+Example: `monitoring/service-pod-events.sh k8ssandra-dc1-stargate-service` 
 
 This script prints the Events that Kubernetes has tracked against the pods that match the specified service's selector. If you do not specify a service, 
 it will print a list of services in the namespace. For each pod, it also prints the Created timestamp and the pod's Conditions. Pods are listed from oldest to 
@@ -180,7 +180,7 @@ problem indications (e.g. CrashLoopBackoff and high restart counts). If you don'
 
 #### watch-service-events.sh
 Usage: `monitoring/watch-service-events.sh [serviceName]` \
-Example: `monitoring/watch-service-events.sh k8ssandra-dc1-stargate-service` \
+Example: `monitoring/watch-service-events.sh k8ssandra-dc1-stargate-service` 
 
 This script is shorthand for `watch -cd service-pod-events.sh [serviceName]`, plus some small niceties. If you do not specify a service, it will print a list
 of services in the namespace.
@@ -199,14 +199,14 @@ shell's autocomplete functionality.
 This script retrieves the k8ssandra superuser credentials and prints them to your console.
 
 #### get-value.sh
-Usage: `utils/get-value.sh '.some.value'` \
+Usage: `utils/get-value.sh '.some.value'` 
 
 This script checks your values file for a specified value. If found, it will print the value. If not found, it will fall back to the chart's default values and
 print that.
 
 #### resume-cassandra.sh
 Usage: `utils/resume-cassandra.sh [datacenter]` \
-Example: `utils/resume-cassandra.sh 'dc2'` \
+Example: `utils/resume-cassandra.sh 'dc2'` 
 
 This script resumes a CassandraDatacenter that has previously been stopped (e.g. by using stop-cassandra.sh). If a datacenter is not specified, defaults to `dc1`.
 
@@ -214,13 +214,13 @@ This script resumes a CassandraDatacenter that has previously been stopped (e.g.
 Usage: `utils/scale-cassandra.sh [-d datacenter] [size]` \
 Example: `utils/get-value.sh -d 'dc2'` (outputs the current size of the `dc2` datacenter)\
 Example: `utils/get-value.sh 5` (sets the size of `dc1` to five nodes).\
-Example: `utils/get-value.sh -d 'dc2' 7` (sets the size of `dc2` to seven nodes) \
+Example: `utils/get-value.sh -d 'dc2' 7` (sets the size of `dc2` to seven nodes) 
 
 This script scales the number of nodes in a CassandraDatacenter, or reports the current scale. If a datacenter is not specified, defaults to `dc1`.
 
 #### stop-cassandra.sh
 Usage: `utils/stop-cassandra.sh [datacenter]` \
-Example: `utils/stop-cassandra.sh 'dc2'` \
+Example: `utils/stop-cassandra.sh 'dc2'` 
 
 This script initiates a graceful shutdown of the Cassandra nodes in a CassandraDatacenter. If a datacenter is not specified, defaults to `dc1`.
 
