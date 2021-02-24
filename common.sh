@@ -313,11 +313,12 @@ while getopts :n: opt; do
       ;;
     \:)
       echo -e "${BOLDRED}Missing required option after -${OPTARG}${NOCOLOR}" >&2
+      exit 99
       ;;
     *)
       echo -e "${BOLDRED}Error encountered at line ${LINENO}.${NOCOLOR}"
       echo -e "${RED}${scriptname}: unknown error while parsing arguments${NOCOLOR}"
-      exit 8
+      exit 100
     ;;
   esac
   shift

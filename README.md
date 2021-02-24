@@ -227,6 +227,19 @@ This script initiates a graceful shutdown of the Cassandra nodes in a CassandraD
 #### wait-for-ready.sh
 This script waits for Cassandra and Stargate (if enabled) to be fully online and ready.
 
+## Global Options and Behaviors
+
+By default, all scripts use colorized output, unless stdout is not a terminal (tty), e.g. if the script's output is being piped. 
+
+All scripts accept the following options:
+
+| Option       | Description |
+| ------------ | ----------- |
+| --nocolor    | Disable colorized output regardless of stdout's tty-ness. |
+| --color      | Enable colorized output regardless of stdout's tty-ness. |
+| -n namespace | Use the specified namespace instead of the one specified in the values file. Note that some scripts might not perform correctly when using an alternate namespace. | 
+
+
 ## Todo:
 * Update common.sh to detect color-capable shells and disable color automatically.
 * Add support for minikube.
