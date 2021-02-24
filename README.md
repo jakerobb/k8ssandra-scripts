@@ -158,22 +158,22 @@ For an example, try passing `Stargate` or `medusa`.
 
 ### Manage
 #### resume-cassandra.sh
-Usage: `utils/resume-cassandra.sh [datacenter]` \
-Example: `utils/resume-cassandra.sh 'dc2'`
+Usage: `manage/resume-cassandra.sh [datacenter]` \
+Example: `manage/resume-cassandra.sh 'dc2'`
 
 This script resumes a CassandraDatacenter that has previously been stopped (e.g. by using stop-cassandra.sh). If a datacenter is not specified, defaults to `dc1`.
 
 #### scale-cassandra.sh
-Usage: `utils/scale-cassandra.sh [-d datacenter] [size]` \
-Example: `utils/get-value.sh -d 'dc2'` (outputs the current size of the `dc2` datacenter)\
-Example: `utils/get-value.sh 5` (sets the size of `dc1` to five nodes).\
-Example: `utils/get-value.sh -d 'dc2' 7` (sets the size of `dc2` to seven nodes)
+Usage: `manage/scale-cassandra.sh [-d datacenter] [size]` \
+Example: `manage/get-value.sh -d 'dc2'` (outputs the current size of the `dc2` datacenter)\
+Example: `manage/get-value.sh 5` (sets the size of `dc1` to five nodes).\
+Example: `manage/get-value.sh -d 'dc2' 7` (sets the size of `dc2` to seven nodes)
 
 This script scales the number of nodes in a CassandraDatacenter, or reports the current scale. If a datacenter is not specified, defaults to `dc1`.
 
 #### stop-cassandra.sh
-Usage: `utils/stop-cassandra.sh [datacenter]` \
-Example: `utils/stop-cassandra.sh 'dc2'`
+Usage: `manage/stop-cassandra.sh [datacenter]` \
+Example: `manage/stop-cassandra.sh 'dc2'`
 
 This script initiates a graceful shutdown of the Cassandra nodes in a CassandraDatacenter. If a datacenter is not specified, defaults to `dc1`.
 
@@ -194,10 +194,10 @@ it will print a list of services in the namespace. For each pod, it also prints 
 newest.
 
 #### watch.sh
-Usage: `utils/watch.sh [resourceType]` \
-Example: `utils/watch.sh` \
-Example: `utils/watch.sh deployments` \
-Example: `utils/watch.sh all`
+Usage: `monitoring/watch.sh [resourceType]` \
+Example: `monitoring/watch.sh` \
+Example: `monitoring/watch.sh deployments` \
+Example: `monitoring/watch.sh all`
 
 This script simply watches the target namespace for a resource type of your choosing. It is useful for monitoring setup progress and watching for telltale
 problem indications (e.g. CrashLoopBackoff and high restart counts). If you don't provide a resource type, it will use `pods`.
