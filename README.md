@@ -154,40 +154,78 @@ what gets printed to the console), and that is the string which will be tested a
 
 For an example, try passing `Stargate` or `medusa`. 
 
-### Utilities
-#### debug-templates.sh
-Usage: `utils/debug-templates.sh ['template file path']`
-Outputs the Helm templates that would be generated and installed by `setup-k8ssandra.sh` (helm install) or `update-k8ssandra.sh` (helm upgrade). If a template
-file path is specified, it will be passed to `helm template --debug` via the `--show-only` option. The template file path should be specified relative to the 
-chart, i.e. `utils/debug-templates.sh templates/stargate/stargate.yaml`
+### Monitoring
+#### pod-events.sh
+Usage: `monitoring/pod-events.sh [podName]` \
+Example: `monitoring/pod-events.sh k8ssandra-dc1-stargate-85948dc948-gcbqb` \
 
-#### get-credentials.sh
-(todo)
+This script prints the Events that Kubernetes has tracked against the specified pod. If you do not specify a pod, it will print a list of pods in the namespace.
 
-#### get-value.sh
-(todo)
+#### service-pod-events.sh
+Usage: `monitoring/service-pod-events.sh [serviceName]` \
+Example: `monitoring/service-pod-events.sh k8ssandra-dc1-stargate-service` \
 
-#### resume-cassandra.sh
-(todo)
-
-#### scale-cassandra.sh
-(todo)
-
-#### stop-cassandra.sh
-(todo)
-
-#### get-value.sh
-(todo)
+This script prints the Events that Kubernetes has tracked against the pods that match the specified service's selector. If you do not specify a service, 
+it will print a list of services in the namespace. For each pod, it also prints the Created timestamp and the pod's Conditions. Pods are listed from oldest to 
+newest.
 
 #### watch.sh
-
 Usage: `utils/watch.sh [resourceType]` \
 Example: `utils/watch.sh` \
 Example: `utils/watch.sh deployments` \
 Example: `utils/watch.sh all`
 
-This script simply watches the target namespace for a resource type of your choosing. It is useful for monitoring setup progress and watching for telltale 
+This script simply watches the target namespace for a resource type of your choosing. It is useful for monitoring setup progress and watching for telltale
 problem indications (e.g. CrashLoopBackoff and high restart counts). If you don't provide a resource type, it will use `pods`.
+
+#### watch-service-events.sh
+Usage: `monitoring/watch-service-events.sh [serviceName]` \
+Example: `monitoring/watch-service-events.sh k8ssandra-dc1-stargate-service` \
+
+This script is shorthand for `watch -cd service-pod-events.sh [serviceName]`, plus some small niceties. If you do not specify a service, it will print a list
+of services in the namespace.
+
+
+### Utilities
+#### debug-templates.sh
+Usage: `utils/debug-templates.sh ['template file path']`
+
+Outputs the Helm templates that would be generated and installed by `setup-k8ssandra.sh` (helm install) or `update-k8ssandra.sh` (helm upgrade). If a template
+file path is specified, it will be passed to `helm template --debug` via the `--show-only` option. The template file path should be specified relative to the 
+chart, i.e. `utils/debug-templates.sh templates/stargate/stargate.yaml`. If you invoke it from the chart directory, you might be able to take advantage of your 
+shell's autocomplete functionality.
+
+#### get-credentials.sh
+This script retrieves the k8ssandra superuser credentials and prints them to your console.
+
+#### get-value.sh
+Usage: `utils/get-value.sh '.some.value'` \
+
+This script checks your values file for a specified value. If found, it will print the value. If not found, it will fall back to the chart's default values and
+print that.
+
+#### resume-cassandra.sh
+Usage: `utils/resume-cassandra.sh [datacenter]` \
+Example: `utils/resume-cassandra.sh 'dc2'` \
+
+This script resumes a CassandraDatacenter that has previously been stopped (e.g. by using stop-cassandra.sh). If a datacenter is not specified, defaults to `dc1`.
+
+#### scale-cassandra.sh
+Usage: `utils/scale-cassandra.sh [-d datacenter] [size]` \
+Example: `utils/get-value.sh -d 'dc2'` (outputs the current size of the `dc2` datacenter)\
+Example: `utils/get-value.sh 5` (sets the size of `dc1` to five nodes).\
+Example: `utils/get-value.sh -d 'dc2' 7` (sets the size of `dc2` to seven nodes) \
+
+This script scales the number of nodes in a CassandraDatacenter, or reports the current scale. If a datacenter is not specified, defaults to `dc1`.
+
+#### stop-cassandra.sh
+Usage: `utils/stop-cassandra.sh [datacenter]` \
+Example: `utils/stop-cassandra.sh 'dc2'` \
+
+This script initiates a graceful shutdown of the Cassandra nodes in a CassandraDatacenter. If a datacenter is not specified, defaults to `dc1`.
+
+#### wait-for-ready.sh
+This script waits for Cassandra and Stargate (if enabled) to be fully online and ready.
 
 ## Todo:
 * Update common.sh to detect color-capable shells and disable color automatically.
@@ -200,5 +238,4 @@ problem indications (e.g. CrashLoopBackoff and high restart counts). If you don'
 * Add support for nginx for ingress
 * Add `-n [namespace]` option to watch.sh
 * Add `-c` option to unit-tests.sh and integration-tests.sh to add coverage
-* Flesh out docs for get-credentials.sh, get-value.sh, and other new entries under utils
 * Use `set -x` in more scripts

@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
 # note: this file is intended to be sourced by other scripts
 
-# todo: add check to see if terminal colors are supported: https://unix.stackexchange.com/questions/9957/how-to-check-if-bash-can-print-colors
-MODE="terminal"
-if [ -t 1 ] ; then
-  if [[ "$1" == "-nc" ]]; then
-    shift
-    MODE="pipe"
-  fi
-else
+if [[ "$1" == "--nocolor" ]]; then
+  shift
   MODE="pipe"
+  COLORMODE="--nocolor"
+elif [[ "$1" == "--color" ]]; then
+  shift
+  MODE="terminal"
+  COLORMODE="--color"
+else
+  # todo: add check to see if terminal colors are supported: https://unix.stackexchange.com/questions/9957/how-to-check-if-bash-can-print-colors
+  if [ -t 1 ] ; then
+    MODE="terminal"
+    COLORMODE="--color"
+  else
+    MODE="pipe"
+    COLORMODE="--nocolor"
+  fi
 fi
 
 if [[ "$MODE" == "pipe" ]]; then
@@ -29,21 +37,21 @@ if [[ "$MODE" == "pipe" ]]; then
   WHITE=''
   BOLDWHITE=''
 else
-  NOCOLOR='\033[0m'
-  RED='\033[0;31m'
-  BOLDRED='\033[1;31m'
-  GREEN='\033[0;32m'
-  BOLDGREEN='\033[1;32m'
-  YELLOW='\033[0;33m'
-  BOLDYELLOW='\033[1;33m'
-  BLUE='\033[0;34m'
-  BOLDBLUE='\033[1;34m'
-  MAGENTA='\033[0;35m'
-  BOLDMAGENTA='\033[1;35m'
-  CYAN='\033[0;36m'
-  BOLDCYAN='\033[1;36m'
-  WHITE='\033[0;37m'
-  BOLDWHITE='\033[1;37m'
+  NOCOLOR=$(printf '\033[0m')
+  RED=$(printf '\033[0;31m')
+  BOLDRED=$(printf '\033[1;31m')
+  GREEN=$(printf '\033[0;32m')
+  BOLDGREEN=$(printf '\033[1;32m')
+  YELLOW=$(printf '\033[0;33m')
+  BOLDYELLOW=$(printf '\033[1;33m')
+  BLUE=$(printf '\033[0;34m')
+  BOLDBLUE=$(printf '\033[1;34m')
+  MAGENTA=$(printf '\033[0;35m')
+  BOLDMAGENTA=$(printf '\033[1;35m')
+  CYAN=$(printf '\033[0;36m')
+  BOLDCYAN=$(printf '\033[1;36m')
+  WHITE=$(printf '\033[0;37m')
+  BOLDWHITE=$(printf '\033[1;37m')
 fi
 
 getValueFromChartOrValuesFile() {
@@ -106,13 +114,48 @@ getCredentials() {
 }
 
 getStargateHost() {
-  STARGATE_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.rest.host')"
-  if [[ "${STARGATE_HOST}" == "*" || "${STARGATE_HOST}" == "null" || -z "${STARGATE_HOST}" ]]; then
-    STARGATE_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.host')"
+  INGRESS_ENABLED="$(getValueFromChartOrValuesFile '.stargate.ingress.enabled')"
+  if [[ "${INGRESS_ENABLED}" == "true" ]]; then
+    STARGATE_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.rest.host')"
     if [[ "${STARGATE_HOST}" == "*" || "${STARGATE_HOST}" == "null" || -z "${STARGATE_HOST}" ]]; then
-      STARGATE_HOST=localhost
+      STARGATE_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.host')"
+      if [[ "${STARGATE_HOST}" == "*" || "${STARGATE_HOST}" == "null" || -z "${STARGATE_HOST}" ]]; then
+        STARGATE_HOST=localhost
+      fi
+    fi
+    if nslookup "${STARGATE_HOST}" &> /dev/null; then
+      echo -e "${BOLDBLUE}Using ingress via host ${STARGATE_HOST}...${NOCOLOR}"
+      return
+    else
+      echo -e "${BOLDRED}Unable to resolve ${STARGATE_HOST}; cannot use ingress. ${NOCOLOR}"
+      echo -e "${RED}To resolve this, configure a different value for ${MAGENTA}.stargate.ingress.host${RED} or add an entry in your hosts file or local DNS service. Falling back to port forward...${NOCOLOR}"
     fi
   fi
+
+  kill -9 $(cat "stargate-port-forward.pid" 2> /dev/null) &> /dev/null || true
+
+  echo -e "\n${BOLDBLUE}Forwarding local port ${FORWARD_PORT} to Stargate...${NOCOLOR}"
+  kubectl port-forward -n ${NAMESPACE} service/${SERVICE} "${FORWARD_PORT}:${PORT}" &> "stargate-port-forward.log" &
+  PORT_FORWARD_PID=$!
+  echo "${PORT_FORWARD_PID}" > "stargate-port-forward.pid"
+  sleep 0.5
+
+  if kill -0 ${PORT_FORWARD_PID} &> /dev/null; then
+    echo -e "\n${BOLDBLUE}Waiting for Stargate service to be ready on port ${FORWARD_PORT}...${NOCOLOR}"
+    until nc -zv localhost "${FORWARD_PORT}" &> /dev/null; do sleep 1; echo -ne "${BOLDBLUE}.${NOCOLOR}"; done
+
+    echo -e "\n${BOLDGREEN}Stargate is ready.${NOCOLOR}"
+    STARGATE_HOST=localhost
+    exit
+  else
+    echo -e "${BOLDRED}Failed to create proxy.${NOCOLOR}"
+    cat "stargate-port-forward.log" >&2
+    return 1
+  fi
+}
+
+killStargatePortForward() {
+  kill -9 $(cat "stargate-port-forward.pid" 2> /dev/null) &> /dev/null || true
 }
 
 getStargateAuthToken() {

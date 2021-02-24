@@ -10,7 +10,6 @@ if [[ "${STARGATE_ENABLED}" != "true" ]]; then
   exit 1
 fi
 
-getStargateHost
 
 typeset -i i i # i is an integer
 typeset -i i NUM_PROCESSES # end is an integer
@@ -19,7 +18,8 @@ if [[ "$1" == "-n" ]]; then
   NUM_REQUESTS=$3
   NAME=$4
 
-  echo -e "${BOLDBLUE}Stargate host: ${BLUE}${STARGATE_HOST}${NOCOLOR}"
+  getStargateHost
+
   echo -e "${BOLDBLUE}Determining credentials for ${CLUSTERNAME}...${NOCOLOR}"
 
   getCredentials
@@ -48,7 +48,7 @@ if [[ "$1" == "-n" ]]; then
   TOTAL_REQUESTS=$((($NUM_REQUESTS*$NUM_PROCESSES)))
   echo -e "\n${BOLDBLUE}Spawning ${NUM_PROCESSES} processes...${NOCOLOR}"
   for ((i=1;i<=NUM_PROCESSES;++i)); do
-    run/stargate-load-test.sh "${STARGATE_AUTH_TOKEN}" "${KEYSPACE_NAME}" $i ${NUM_REQUESTS} &
+    run/stargate-load-test.sh "${STARGATE_HOST}" "${STARGATE_AUTH_TOKEN}" "${KEYSPACE_NAME}" $i ${NUM_REQUESTS} &
   done
   echo -n "Starting requests in 3... "
   sleep 1
@@ -78,15 +78,22 @@ if [[ "$1" == "-n" ]]; then
   echo -e "${BOLDBLUE}Deleting keyspace ${KEYSPACE_NAME}...${NOCOLOR}"
   callStargateRestApi 'DELETE' "/v2/schemas/keyspaces/${KEYSPACE_NAME}"
 
+  if [[ -f "stargate-port-forward.pid" ]]; then
+    echo -e "${BOLDBLUE}Terminating port forward...${NOCOLOR}"
+    killStargatePortForward
+  fi
+
   sayStatus "Test finished."
   exit
 fi
 
-STARGATE_AUTH_TOKEN=$1
-KEYSPACE_NAME=$2
-INDEX=$3
-CALLS=$4
+STARGATE_HOST=$1
+STARGATE_AUTH_TOKEN=$2
+KEYSPACE_NAME=$3
+INDEX=$4
+CALLS=$5
 
+set +e
 sleep 3
 echo -n "" > stargate-load-${INDEX}.out
 for ((i=1;i<=CALLS;++i)); do
@@ -98,8 +105,15 @@ for ((i=1;i<=CALLS;++i)); do
     >&2 echo -ne "${BOLDRED}X${NOCOLOR}"
     echo "exit ${EXIT_CODE}" >> stargate-load-${INDEX}.out
   elif [[ "$RESPONSE" != "$EXPECTED" ]]; then
-    >&2 echo -ne "${BOLDRED}x${NOCOLOR}"
     echo "$RESPONSE" >> stargate-load-${INDEX}.out
+    RESPONSE_CODE=$(jq -r '.code' <<< "${RESPONSE}" 2> /dev/null)
+    if [[ "${RESPONSE_CODE}" == "401" ]]; then
+      >&2 echo -ne "${BOLDMAGENTA}?${NOCOLOR}"
+      getCredentials
+      getStargateAuthToken
+    else
+      >&2 echo -ne "${BOLDRED}x${NOCOLOR}"
+    fi
   else
     >&2 echo -n "."
     echo "ok" >> stargate-load-${INDEX}.out
