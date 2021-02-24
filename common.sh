@@ -1,57 +1,13 @@
 #!/usr/bin/env bash
 # note: this file is intended to be sourced by other scripts
 
-if [[ "$1" == "--nocolor" ]]; then
-  shift
-  MODE="pipe"
-  COLORMODE="--nocolor"
-elif [[ "$1" == "--color" ]]; then
-  shift
+# todo: add check to see if terminal colors are supported: https://unix.stackexchange.com/questions/9957/how-to-check-if-bash-can-print-colors
+if [ -t 1 ] ; then
   MODE="terminal"
   COLORMODE="--color"
 else
-  # todo: add check to see if terminal colors are supported: https://unix.stackexchange.com/questions/9957/how-to-check-if-bash-can-print-colors
-  if [ -t 1 ] ; then
-    MODE="terminal"
-    COLORMODE="--color"
-  else
-    MODE="pipe"
-    COLORMODE="--nocolor"
-  fi
-fi
-
-if [[ "$MODE" == "pipe" ]]; then
-  NOCOLOR=''
-  RED=''
-  BOLDRED=''
-  GREEN=''
-  BOLDGREEN=''
-  YELLOW=''
-  BOLDYELLOW=''
-  BLUE=''
-  BOLDBLUE=''
-  MAGENTA=''
-  BOLDMAGENTA=''
-  CYAN=''
-  BOLDCYAN=''
-  WHITE=''
-  BOLDWHITE=''
-else
-  NOCOLOR=$(printf '\033[0m')
-  RED=$(printf '\033[0;31m')
-  BOLDRED=$(printf '\033[1;31m')
-  GREEN=$(printf '\033[0;32m')
-  BOLDGREEN=$(printf '\033[1;32m')
-  YELLOW=$(printf '\033[0;33m')
-  BOLDYELLOW=$(printf '\033[1;33m')
-  BLUE=$(printf '\033[0;34m')
-  BOLDBLUE=$(printf '\033[1;34m')
-  MAGENTA=$(printf '\033[0;35m')
-  BOLDMAGENTA=$(printf '\033[1;35m')
-  CYAN=$(printf '\033[0;36m')
-  BOLDCYAN=$(printf '\033[1;36m')
-  WHITE=$(printf '\033[0;37m')
-  BOLDWHITE=$(printf '\033[1;37m')
+  MODE="pipe"
+  COLORMODE="--nocolor"
 fi
 
 getValueFromChartOrValuesFile() {
@@ -305,3 +261,65 @@ CLUSTERNAME="$(getValueFromChartOrValuesFile '.cassandra.clusterName')"
 if [[ -z "${CLUSTERNAME}" || "${CLUSTERNAME}" == null ]]; then
   CLUSTERNAME=${RELEASE_NAME}
 fi
+
+if [[ "$1" == "--nocolor" ]]; then
+  shift
+  MODE="pipe"
+  COLORMODE="--nocolor"
+elif [[ "$1" == "--color" ]]; then
+  shift
+  MODE="terminal"
+  COLORMODE="--color"
+fi
+
+if [[ "$MODE" == "pipe" ]]; then
+  NOCOLOR=''
+  RED=''
+  BOLDRED=''
+  GREEN=''
+  BOLDGREEN=''
+  YELLOW=''
+  BOLDYELLOW=''
+  BLUE=''
+  BOLDBLUE=''
+  MAGENTA=''
+  BOLDMAGENTA=''
+  CYAN=''
+  BOLDCYAN=''
+  WHITE=''
+  BOLDWHITE=''
+else
+  NOCOLOR=$(printf '\033[0m')
+  RED=$(printf '\033[0;31m')
+  BOLDRED=$(printf '\033[1;31m')
+  GREEN=$(printf '\033[0;32m')
+  BOLDGREEN=$(printf '\033[1;32m')
+  YELLOW=$(printf '\033[0;33m')
+  BOLDYELLOW=$(printf '\033[1;33m')
+  BLUE=$(printf '\033[0;34m')
+  BOLDBLUE=$(printf '\033[1;34m')
+  MAGENTA=$(printf '\033[0;35m')
+  BOLDMAGENTA=$(printf '\033[1;35m')
+  CYAN=$(printf '\033[0;36m')
+  BOLDCYAN=$(printf '\033[1;36m')
+  WHITE=$(printf '\033[0;37m')
+  BOLDWHITE=$(printf '\033[1;37m')
+fi
+
+while getopts :n: opt; do
+  case ${opt} in
+    n) NAMESPACE=${OPTARG}
+      shift
+      ;;
+    \:)
+      echo -e "${BOLDRED}Missing required option after -${OPTARG}${NOCOLOR}" >&2
+      ;;
+    *)
+      echo -e "${BOLDRED}Error encountered at line ${LINENO}.${NOCOLOR}"
+      echo -e "${RED}${scriptname}: unknown error while parsing arguments${NOCOLOR}"
+      exit 8
+    ;;
+  esac
+  shift
+done
+
