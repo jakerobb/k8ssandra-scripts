@@ -156,6 +156,28 @@ what gets printed to the console), and that is the string which will be tested a
 
 For an example, try passing `Stargate` or `medusa`. 
 
+### Manage
+#### resume-cassandra.sh
+Usage: `utils/resume-cassandra.sh [datacenter]` \
+Example: `utils/resume-cassandra.sh 'dc2'`
+
+This script resumes a CassandraDatacenter that has previously been stopped (e.g. by using stop-cassandra.sh). If a datacenter is not specified, defaults to `dc1`.
+
+#### scale-cassandra.sh
+Usage: `utils/scale-cassandra.sh [-d datacenter] [size]` \
+Example: `utils/get-value.sh -d 'dc2'` (outputs the current size of the `dc2` datacenter)\
+Example: `utils/get-value.sh 5` (sets the size of `dc1` to five nodes).\
+Example: `utils/get-value.sh -d 'dc2' 7` (sets the size of `dc2` to seven nodes)
+
+This script scales the number of nodes in a CassandraDatacenter, or reports the current scale. If a datacenter is not specified, defaults to `dc1`.
+
+#### stop-cassandra.sh
+Usage: `utils/stop-cassandra.sh [datacenter]` \
+Example: `utils/stop-cassandra.sh 'dc2'`
+
+This script initiates a graceful shutdown of the Cassandra nodes in a CassandraDatacenter. If a datacenter is not specified, defaults to `dc1`.
+
+
 ### Monitoring
 #### pod-events.sh
 Usage: `monitoring/pod-events.sh [podName]` \
@@ -205,26 +227,6 @@ Usage: `utils/get-value.sh '.some.value'`
 
 This script checks your values file for a specified value. If found, it will print the value. If not found, it will fall back to the chart's default values and
 print that.
-
-#### resume-cassandra.sh
-Usage: `utils/resume-cassandra.sh [datacenter]` \
-Example: `utils/resume-cassandra.sh 'dc2'` 
-
-This script resumes a CassandraDatacenter that has previously been stopped (e.g. by using stop-cassandra.sh). If a datacenter is not specified, defaults to `dc1`.
-
-#### scale-cassandra.sh
-Usage: `utils/scale-cassandra.sh [-d datacenter] [size]` \
-Example: `utils/get-value.sh -d 'dc2'` (outputs the current size of the `dc2` datacenter)\
-Example: `utils/get-value.sh 5` (sets the size of `dc1` to five nodes).\
-Example: `utils/get-value.sh -d 'dc2' 7` (sets the size of `dc2` to seven nodes) 
-
-This script scales the number of nodes in a CassandraDatacenter, or reports the current scale. If a datacenter is not specified, defaults to `dc1`.
-
-#### stop-cassandra.sh
-Usage: `utils/stop-cassandra.sh [datacenter]` \
-Example: `utils/stop-cassandra.sh 'dc2'` 
-
-This script initiates a graceful shutdown of the Cassandra nodes in a CassandraDatacenter. If a datacenter is not specified, defaults to `dc1`.
 
 #### wait-for-ready.sh
 This script waits for Cassandra and Stargate (if enabled) to be fully online and ready.
