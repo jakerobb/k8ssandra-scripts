@@ -13,6 +13,6 @@ else
 fi
 
 set -x
-helm install ${RELEASENAME} ${K8SSANDRA_DIR}/charts/k8ssandra  --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} --create-namespace -f ${VALUES_FILE}
+helm install ${RELEASE_NAME} ${K8SSANDRA_DIR}/charts/k8ssandra  --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} --create-namespace -f ${VALUES_FILE}
 
 

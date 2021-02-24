@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 source common.sh
 
 echo -e "\n${BOLDBLUE}Waiting for Prometheus pod to be ready...${NOCOLOR}"
-NAME="${RELEASENAME}-kube-prometheus-prometheus"
+NAME="${RELEASE_NAME}-kube-prometheus-prometheus"
 until kubectl wait --for=condition=ready -n ${NAMESPACE} pod -l app=prometheus -l operator.prometheus.io/name=${NAME}; do sleep 1; echo -ne "${BOLDBLUE}.${NOCOLOR}"; done
 
 accessClusterResource "Prometheus" 9090 "/graph" "prometheus" 9090 $NAME

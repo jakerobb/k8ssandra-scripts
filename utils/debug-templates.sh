@@ -14,7 +14,7 @@ printContext
 set +e
 cd ${K8SSANDRA_DIR}
 if [[ -n "$1" ]]; then
-  HELM_OUTPUT=$(set -x; helm template --debug ${RELEASENAME} charts/k8ssandra --show-only "$1" \
+  HELM_OUTPUT=$(set -x; helm template --debug ${RELEASE_NAME} charts/k8ssandra --show-only "$1" \
                      --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} --create-namespace -f ${VALUES_FILE} 2> /dev/null)
   EXIT_CODE=$?
   if [[ "${EXIT_CODE}" -ne 0 ]]; then
@@ -22,7 +22,7 @@ if [[ -n "$1" ]]; then
     echo -e "\n${RED}Invoking again without that option...${NOCOLOR}"
     (
       set -x
-      helm template --debug ${RELEASENAME} charts/k8ssandra \
+      helm template --debug ${RELEASE_NAME} charts/k8ssandra \
                     --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} --create-namespace -f ${VALUES_FILE}
     )
   else
@@ -31,7 +31,7 @@ if [[ -n "$1" ]]; then
 else
   (
     set -x
-    helm template --debug ${RELEASENAME} charts/k8ssandra \
+    helm template --debug ${RELEASE_NAME} charts/k8ssandra \
                   --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} --create-namespace -f ${VALUES_FILE}
   )
 fi

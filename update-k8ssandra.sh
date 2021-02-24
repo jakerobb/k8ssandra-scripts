@@ -13,7 +13,7 @@ else
 fi
 
 set -x
-helm upgrade ${RELEASENAME} ${K8SSANDRA_DIR}/charts/k8ssandra --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} -f ${VALUES_FILE}
+helm upgrade ${RELEASE_NAME} ${K8SSANDRA_DIR}/charts/k8ssandra --set cassandra.cassandraLibDirVolume.storageClass=${STORAGE_CLASS} -n ${NAMESPACE} -f ${VALUES_FILE}
 
 utils/wait-for-ready.sh
 utils/get-credentials.sh

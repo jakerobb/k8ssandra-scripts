@@ -5,7 +5,7 @@ source common.sh
 
 echo -e "${BOLDBLUE}Tearing down...${NOCOLOR}"
 echo -e "${BOLDCYAN}NAMESPACE: ${CYAN}${NAMESPACE}${NOCOLOR}"
-echo -e "${BOLDCYAN}RELEASENAME: ${CYAN}${RELEASENAME}${NOCOLOR}"
+echo -e "${BOLDCYAN}RELEASE_NAME: ${CYAN}${RELEASE_NAME}${NOCOLOR}"
 echo -e "${BOLDCYAN}KUBE_ENV: ${CYAN}${KUBE_ENV}${NOCOLOR}"
 
 if [[ "$1" == "-p" ]]; then

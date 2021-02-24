@@ -31,7 +31,7 @@ if [[ "${STARGATE_ENABLED}" == "true" ]]; then
   echo -e "\n${BOLDBLUE}Waiting for Stargate to start...${NOCOLOR}"
   (
     set -x
-    kubectl rollout status -n ${NAMESPACE} deployment ${RELEASENAME}-dc1-stargate
+    kubectl rollout status -n ${NAMESPACE} deployment ${RELEASE_NAME}-dc1-stargate
   )
 else
   echo -e "\n${BOLDBLUE}Stargate is disabled; nothing to wait for.${NOCOLOR}"

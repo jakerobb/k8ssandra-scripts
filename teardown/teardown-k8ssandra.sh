@@ -5,4 +5,4 @@ source common.sh
 
 echo -e "${BOLDBLUE}Tearing down K8ssandra installation...${NOCOLOR}"
 set -x
-helm uninstall ${RELEASENAME} -n ${NAMESPACE}
+helm uninstall ${RELEASE_NAME} -n ${NAMESPACE}

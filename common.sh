@@ -101,7 +101,7 @@ printContext() {
   echo ""
   echo -e "${BOLDCYAN}NAMESPACE: ${CYAN}${NAMESPACE}${NOCOLOR}"
   echo -e "${BOLDCYAN}CLUSTERNAME: ${CYAN}${CLUSTERNAME}${NOCOLOR}"
-  echo -e "${BOLDCYAN}RELEASENAME: ${CYAN}${RELEASENAME}${NOCOLOR}"
+  echo -e "${BOLDCYAN}RELEASE_NAME: ${CYAN}${RELEASE_NAME}${NOCOLOR}"
   echo -e "${BOLDCYAN}KUBE_ENV: ${CYAN}${KUBE_ENV}${NOCOLOR}"
   echo -e "${BOLDCYAN}Values:${NOCOLOR}"
   yq '.' ${VALUES_FILE}
@@ -303,5 +303,5 @@ if [[ -z "${NAMESPACE}" ||  "${NAMESPACE}" == null ]]; then
 fi
 CLUSTERNAME="$(getValueFromChartOrValuesFile '.cassandra.clusterName')"
 if [[ -z "${CLUSTERNAME}" || "${CLUSTERNAME}" == null ]]; then
-  CLUSTERNAME=${RELEASENAME}
+  CLUSTERNAME=${RELEASE_NAME}
 fi

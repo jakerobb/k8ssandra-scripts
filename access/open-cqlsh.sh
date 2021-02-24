@@ -29,7 +29,7 @@ fi
 if [[ "${STARGATE_ENABLED}" == "true" && "${STARGATE_CASSANDRA_INGRESS_ENABLED}" == "true" ]]; then
   echo -e "${BOLDBLUE}Using via-Stargate ingress...${NOCOLOR}"
   echo -e "\n${BOLDBLUE}Waiting for Stargate to start...${NOCOLOR}"
-  until kubectl wait --for=condition=available -n ${NAMESPACE} deployment ${RELEASENAME}-dc1-stargate &> /dev/null; do sleep 1; done
+  until kubectl wait --for=condition=available -n ${NAMESPACE} deployment ${RELEASE_NAME}-dc1-stargate &> /dev/null; do sleep 1; done
   echo -e "\n${BOLDGREEN}Stargate is ready!${NOCOLOR}\n"
 
   INGRESS_HOST="$(getValueFromChartOrValuesFile '.stargate.ingress.host')"

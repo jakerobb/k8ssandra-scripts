@@ -10,13 +10,13 @@ cd "$(dirname "$0")/.."
 source common.sh
 
 echo -e "\n${BOLDBLUE}Waiting for Grafana to be ready...${NOCOLOR}"
-until kubectl wait --for=condition=available -n ${NAMESPACE} deployment ${RELEASENAME}-grafana &> /dev/null; do sleep 1; echo -ne "${BOLDBLUE}.${NOCOLOR}"; done
+until kubectl wait --for=condition=available -n ${NAMESPACE} deployment ${RELEASE_NAME}-grafana &> /dev/null; do sleep 1; echo -ne "${BOLDBLUE}.${NOCOLOR}"; done
 
-GRAFANA_CREDS_JSON=$(kubectl get secret -n ${NAMESPACE} ${RELEASENAME}-grafana -o json)
+GRAFANA_CREDS_JSON=$(kubectl get secret -n ${NAMESPACE} ${RELEASE_NAME}-grafana -o json)
 GRAFANA_USER=$(jq -r '.data."admin-user"' <<< "${GRAFANA_CREDS_JSON}" | base64 -d)
 GRAFANA_PASSWORD=$(jq -r '.data."admin-password"' <<< "${GRAFANA_CREDS_JSON}" | base64 -d)
 echo -e "  ${BOLDWHITE}Grafana User:${NOCOLOR} ${GRAFANA_USER}"
 echo -e "  ${BOLDWHITE}Grafana Password:${NOCOLOR} ${GRAFANA_PASSWORD}"
 
-accessClusterResource "Grafana" 80 "/" "grafana" 3000 "${RELEASENAME}-grafana"
+accessClusterResource "Grafana" 80 "/" "grafana" 3000 "${RELEASE_NAME}-grafana"
 
