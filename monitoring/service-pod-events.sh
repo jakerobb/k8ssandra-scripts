@@ -3,7 +3,6 @@ set -e
 cd "$(dirname "$0")/.."
 source common.sh
 
-echo $1
 SERVICE_NAME=$1
 
 if [[ -z "${SERVICE_NAME}" ]]; then
@@ -13,7 +12,20 @@ if [[ -z "${SERVICE_NAME}" ]]; then
   exit 1
 fi
 
-SELECTOR=$(kubectl get service -n ${NAMESPACE} "${SERVICE_NAME}" -o json | jq -r '.spec.selector | to_entries[] | [.key, .value] | join("=")')
+set +e
+SERVICE_JSON=$(kubectl get service -n ${NAMESPACE} "${SERVICE_NAME}" -o json 2> /dev/null)
+KUBECTL_EXIT_CODE=$?
+if [[ "${KUBECTL_EXIT_CODE}" -ne 0 ]]; then
+  echo -e "${BOLDRED}Service ${SERVICE_NAME} does not exist. (kubectl exit code ${KUBECTL_EXIT_CODE})${NOCOLOR}"
+  exit 1
+fi
+
+SELECTOR=$(jq -r '.spec.selector | to_entries[] | [.key, .value] | join("=")' 2> /dev/null <<< "${SERVICE_JSON}")
+JQ_EXIT_CODE=$?
+if [[ "${JQ_EXIT_CODE}" -ne 0 ]]; then
+  echo -e "${BOLDRED}Service ${SERVICE_NAME} does not have a selector and is therefore not supported by this script. (jq exit code ${JQ_EXIT_CODE})${NOCOLOR}"
+  exit 1
+fi
 PODS=$(sed 's|^|--selector=|' <<< "${SELECTOR}" | xargs kubectl -n ${NAMESPACE} get pods -o=json | jq -r '.items | sort_by(.metadata.creationTimestamp) | .[].metadata.name')
 
 if [[ -n "${PODS}" ]]; then
