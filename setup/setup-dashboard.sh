@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 source common.sh
 
 echo -e "\n${BOLDBLUE}Installing kubernetes-dashboard...${NOCOLOR}"
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.4/aio/deploy/recommended.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
 
 echo -e "\n${BOLDBLUE}Configuring service account with access to the dashboard...${NOCOLOR}"
 cat <<EOF | kubectl apply -f -
