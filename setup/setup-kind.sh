@@ -42,7 +42,7 @@ case ${KUBE_VERSION} in
     IMAGE='kindest/node:v1.15.12'
     ;;
   *)
-    echo -e "\n${BOLDRED}This script does not support Kubernetes version ${KUBE_VERSION} with Kind.${NOCOLOR}"
+    echo -e "\n${BOLDRED}This script does not support Kubernetes version ${KUBE_VERSION} with Kind. Find the right image at ${CYAN}https://hub.docker.com/r/kindest/node${NOCOLOR} and add a branch for it in ${BOLDWHITE}setup-kind.sh${NOCOLOR}!${NOCOLOR}"
     exit 1
     ;;
 esac
@@ -50,8 +50,8 @@ esac
 #todo make these idempotent so we don't need to delete the cluster
 echo -e "\n${BOLDBLUE}Creating Kind cluster with K8s version ${KUBE_VERSION}...${NOCOLOR}"
 
-kind create cluster --image "${IMAGE}" --config ${K8SSANDRA_DIR}/docs/content/en/docs/topics/ingress/traefik/kind-deployment/kind.config.yaml
+kind create cluster --name k8ssandra --image "${IMAGE}" --config ${K8SSANDRA_DIR}/docs/content/en/docs/topics/ingress/traefik/kind-deployment/kind.config.yaml
 
 echo -e "\n${BOLDGREEN}Cluster has been created.${NOCOLOR}\n"
 
-kubectl cluster-info --context kind-kind
+kubectl cluster-info --context kind-k8ssandra

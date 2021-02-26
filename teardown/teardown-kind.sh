@@ -5,4 +5,4 @@ source common.sh
 
 echo -e "${BOLDBLUE}Tearing down kind...${NOCOLOR}"
 set -x
-kind delete cluster &> /dev/null || true
+kind delete cluster --name k8ssandra &> /dev/null || true
