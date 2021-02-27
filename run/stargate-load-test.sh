@@ -13,7 +13,7 @@ fi
 
 typeset -i i i # i is an integer
 typeset -i i NUM_PROCESSES # end is an integer
-if [[ "$1" == "-n" ]]; then
+if [[ "$1" == "-p" ]]; then
   NUM_PROCESSES=$2
   NUM_REQUESTS=$3
   NAME=$4
@@ -95,7 +95,7 @@ CALLS=$5
 
 set +e
 sleep 3
-echo -n "" > stargate-load-${INDEX}.out
+:> stargate-load-${INDEX}.out
 for ((i=1;i<=CALLS;++i)); do
   RESPONSE=$(callStargateRestApi 'PUT' "/v2/keyspaces/${KEYSPACE_NAME}/testdata/Mookie${INDEX}/Betts" \
        "{\"email\": \"mookie.betts.${INDEX}.${i}@email.com\",\"favorite color\": \"blue\"}")
@@ -110,7 +110,7 @@ for ((i=1;i<=CALLS;++i)); do
     if [[ "${RESPONSE_CODE}" == "401" ]]; then
       >&2 echo -ne "${BOLDMAGENTA}?${NOCOLOR}"
       getCredentials
-      getStargateAuthToken
+      AUDIBLE_ANNOUNCEMENTS=false getStargateAuthToken &> /dev/null
     else
       >&2 echo -ne "${BOLDRED}x${NOCOLOR}"
     fi

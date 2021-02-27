@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 source common.sh
 
 echo -e "${BOLDBLUE}Updating K8ssandra installation...${NOCOLOR}"
-printContext
+printContextWithValues
 
 if [[ "$KUBE_ENV" == "k3d" ]]; then
   STORAGE_CLASS=local-path

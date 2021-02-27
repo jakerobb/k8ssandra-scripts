@@ -12,7 +12,7 @@ if [[ -z "${POD_NAME}" ]]; then
   exit 1
 fi
 
-EVENTS=$(kubectl get event -n ${NAMESPACE} --field-selector involvedObject.name=${POD} 2>&1)
+EVENTS=$(kubectl get event -n ${NAMESPACE} --field-selector involvedObject.name=${POD_NAME} 2>&1)
 if [[ "${EVENTS}" != "No resources found in ${NAMESPACE} namespace." ]]; then
   echo -ne "\n${BOLDWHITE}"
   head -n 1 <<< "${EVENTS}"

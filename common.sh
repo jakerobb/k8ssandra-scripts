@@ -51,6 +51,11 @@ sayStatus() {
   wait
 }
 
+printContextWithValues() {
+  printContext
+  printValues
+}
+
 printContext() {
   echo -e "${BOLDCYAN}K8ssandra directory: ${CYAN}${K8SSANDRA_DIR}${NOCOLOR}"
   echo -e "${BOLDCYAN}Git branch: ${CYAN}$(cd ${K8SSANDRA_DIR}; git branch --show-current 2>&1)${NOCOLOR}"
@@ -59,6 +64,9 @@ printContext() {
   echo -e "${BOLDCYAN}CLUSTERNAME: ${CYAN}${CLUSTERNAME}${NOCOLOR}"
   echo -e "${BOLDCYAN}RELEASE_NAME: ${CYAN}${RELEASE_NAME}${NOCOLOR}"
   echo -e "${BOLDCYAN}KUBE_ENV: ${CYAN}${KUBE_ENV}${NOCOLOR}"
+}
+
+printValues() {
   echo -e "${BOLDCYAN}Values:${NOCOLOR}"
   yq '.' ${VALUES_FILE}
 }
@@ -310,19 +318,15 @@ DATACENTER="$(getValueFromChartOrValuesFile '.cassandra.datacenters[0].name')"
 while getopts :n:d: opt; do
   case ${opt} in
     n) NAMESPACE=${OPTARG}
+      shift 2
       ;;
     d) DATACENTER=${OPTARG}
+      shift 2
       ;;
     \:)
       echo -e "${BOLDRED}Missing required option after -${OPTARG}${NOCOLOR}" >&2
-      exit 99
-      ;;
-    *)
-      echo -e "${BOLDRED}Error encountered at line ${LINENO}.${NOCOLOR}"
-      echo -e "${RED}${scriptname}: unknown error while parsing arguments${NOCOLOR}"
       exit 100
-    ;;
+      ;;
   esac
-  shift $((OPTIND -1))
 done
 

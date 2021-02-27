@@ -41,9 +41,10 @@ issue or PR.
 ### The Big Three
 #### setup-all.sh
 Creates and starts everything you need from scratch. When complete, you'll have:
-* Helm configured and updated with all of the necessary repos
+* Helm configured and updated with all the necessary repos
 * A running Kubernetes environment in Kind or k3d
 * kube-dashboard installed
+* Metrics Server installed  
 * Traefik installed and configured (if you have enabled ingress)
 * k8ssandra installed
 
@@ -133,9 +134,54 @@ If you are on a Mac, it will launch the URL in your default browser automaticall
 ### Run
 #### stargate-load-test.sh
 Sends a barrage of REST requests to the Stargate API. 
-Usage: `run/stargate-load-test.sh -n 5 10`
-In the above example, the script will spawn five clones of itself, and each clone will send ten REST requests. Upon conclusion, you'll get a report with the 
-time taken, the total number of requests sent, and the requests per second. You'll also get a collated summary of responses for all requests sent. 
+Usage: `run/stargate-load-test.sh -p 10 100`
+In the above example, the script will spawn ten child processes, and each child will send one hundred REST requests using curl. Upon conclusion, you'll get a 
+report with the time taken, the total number of requests sent, and the requests per second. You'll also get a collated summary of responses for all requests 
+sent. Here is a sample test output. During the test, one of two Stargate nodes was taken offline. (This test was performed before 
+[#436](https://github.com/k8ssandra/k8ssandra/pull/436) was merged; taking a node offline no longer interrupts service like this.)
+
+    $ stargate-load-test.sh -p 10 100
+    Using ingress via host k8ssandra.127.0.0.1.xip.io...
+    Determining credentials for k8ssandra...
+    Getting app token...
+    {"authToken":"853f1c89-219a-4fef-91df-66ad7d1d2029"}
+    Creating keyspace stargate_load_test_qcfjzh...
+    {"name":"stargate_load_test_qcfjzh"}
+    Creating table...
+    {"name":"testdata"}
+    Creating data rows...
+    
+    Spawning 10 processes...
+    Starting requests in 3... 2... 1...
+    Test started at 05:11:17 PM. Sending 1000 requests.
+    ....................................................................................................
+    ....................................................................................................
+    ........x.xx..x.x..xx.x..xx..xxxx..x.x..x.x.x.x.xx.xx..x..x.x.xx..x..x.xxx.x.xx...xxxxxxx....xx..xx.
+    xxx....xx..xx.xx..x.xx.x.x.x..xxxx.x..x.xxxxx....xx..x.x.xxx.x...x...xxxx.xx.xx......xxxx.xxx.......
+    ............xx..xxx..x...x....x...x........x........................................................
+    ....................................................................................................
+    ....................................................................................................
+    ....................................................................................................
+    ....................................................................................................
+    ....................................................................................................
+    Test finished at 05:12:25 PM. Sent 1000 requests in ~68 seconds (~14/sec).
+    
+    Results Summary:
+      93 Bad Gateway
+      10 Gateway Timeout
+      1 [empty response body]
+      892 ok
+      2 {"description":"Server error: Unable to perform authorization of login permission: Operation timed out - received only 0 responses.","code":500}
+      2 {"description":"Server error: org.apache.cassandra.stargate.exceptions.WriteTimeoutException: Operation timed out - received only 0 responses.","code":500}
+    Deleting keyspace stargate_load_test_qcfjzh...
+
+Each dot in the output represents a single successful request. If any of the requests result in an error, you'll see a different character: 
+
+| Character | Meaning | 
+| --- | --- |
+| ? | Received an HTTP 401 response. The subprocess will attempt to grab a new token before proceeding to the next request. |
+| x | The response body did not match the expected result (but was not a 401). |
+| X | `curl` returned a nonzero exit code. |
 
 Note: the data model in use for this test is very simple. Each process repeatedly updates a single column on a single row. There is much that could be done to 
 improve upon this from a load test standpoint.
@@ -227,6 +273,10 @@ Usage: `utils/get-value.sh '.some.value'`
 
 This script checks your values file for a specified value. If found, it will print the value. If not found, it will fall back to the chart's default values and
 print that.
+
+It also prints out the corresponding value as configured in the current Helm installation, if one exists.
+
+The argument is passed to `jq` as a command. If you know `jq`, you can use this to do lots of cool stuff. ;)  
 
 #### wait-for-ready.sh
 This script waits for Cassandra and Stargate (if enabled) to be fully online and ready.

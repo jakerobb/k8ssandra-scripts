@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 source common.sh
 
 echo -e "${BOLDBLUE}Setting up K8ssandra cluster...${NOCOLOR}"
-printContext
+printContextWithValues
 
 setup/setup-helm.sh
 if [[ "${KUBE_ENV}" == "k3d" ]]; then
