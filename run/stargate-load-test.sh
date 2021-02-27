@@ -103,7 +103,10 @@ for ((i=1;i<=CALLS;++i)); do
   EXPECTED="{\"data\":{\"email\":\"mookie.betts.${INDEX}.${i}@email.com\",\"favorite color\":\"blue\"}}"
   if [[ "$EXIT_CODE" -ne 0 ]]; then
     >&2 echo -ne "${BOLDRED}X${NOCOLOR}"
-    echo "exit ${EXIT_CODE}" >> stargate-load-${INDEX}.out
+    echo "curl exit code ${EXIT_CODE}" >> stargate-load-${INDEX}.out
+  elif [[ -z "$RESPONSE" ]]; then
+    echo "[empty response body]" >> stargate-load-${INDEX}.out
+    >&2 echo -ne "${BOLDRED}x${NOCOLOR}"
   elif [[ "$RESPONSE" != "$EXPECTED" ]]; then
     echo "$RESPONSE" >> stargate-load-${INDEX}.out
     RESPONSE_CODE=$(jq -r '.code' <<< "${RESPONSE}" 2> /dev/null)
