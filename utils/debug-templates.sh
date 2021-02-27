@@ -9,7 +9,7 @@ else
   STORAGE_CLASS=standard
 fi
 
-printContext
+printContextWithValues
 
 set +e
 cd ${K8SSANDRA_DIR}
