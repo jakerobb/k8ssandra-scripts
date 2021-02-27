@@ -280,6 +280,7 @@ elif [[ "$1" == "--color" ]]; then
   COLORMODE="--color"
 fi
 
+# todo: add more colors https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
 if [[ "$MODE" == "pipe" ]]; then
   NOCOLOR=''
   RED=''

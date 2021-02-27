@@ -305,3 +305,4 @@ All scripts accept the following options:
 * Add support for nginx for ingress
 * Add `-c` option to unit-tests.sh and integration-tests.sh to add coverage
 * Use `set -x` in more scripts
+* Make set-value.sh which can update your values file and then optionally call update-k8ssandra for you
