@@ -296,6 +296,7 @@ if [[ "$MODE" == "pipe" ]]; then
   BOLDCYAN=''
   WHITE=''
   BOLDWHITE=''
+  DARKGRAY=''
 else
   NOCOLOR=$(printf '\033[0m')
   RED=$(printf '\033[0;31m')
@@ -312,6 +313,7 @@ else
   BOLDCYAN=$(printf '\033[1;36m')
   WHITE=$(printf '\033[0;37m')
   BOLDWHITE=$(printf '\033[1;37m')
+  DARKGRAY=$(printf '\033[0;90m')
 fi
 
 DATACENTER="$(getValueFromChartOrValuesFile '.cassandra.datacenters[0].name')"
